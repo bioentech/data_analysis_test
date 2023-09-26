@@ -109,6 +109,7 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw, Res_SNAC_twoindex ):
     param_to_plot = {
         'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform'},
         'TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'uniform'},
+        'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform'},
         'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
         'pls_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color,'test_color': 'uniform'},
         'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
@@ -812,7 +813,7 @@ def FOS_Hach_plot(data,dict_param,param,path,save_name):
             ax.set_ylim(ymax=dict_param[param]['xy_lim'][0])
             ax.set_xlim(xmax=dict_param[param]['xy_lim'][1])
             ax.yaxis.set_major_formatter("{x:.1f}")  # set tick format with only 1 decimal
-        ax.set_xlabel('ref (' + dict_param[param]['unit'] + ')', fontsize=fontsize, fontname=fontname)
+        ax.set_xlabel('Reference (' + dict_param[param]['unit'] + ')', fontsize=fontsize, fontname=fontname)
         ax.set_ylabel('Hach (' + dict_param[param]['unit'] + ')', fontsize=fontsize, fontname=fontname)
         ax.tick_params(axis='both', labelsize=fontsize_tick)
         ax.legend(loc='upper left', fontsize=fontsize_legend)

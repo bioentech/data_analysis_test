@@ -71,6 +71,8 @@ def round_value_pd(data, decimals=1):
         for ii in data.columns:
             if isinstance(data[ii][i], (int, float, np.integer)): # np.integer because int64 are not recognized as integer
                 data_new[ii][i] = np.around(data[ii][i], decimals=decimals)
+            else:
+                data_new[ii][i] = data[ii][i]
 
     return data_new
 
@@ -169,7 +171,7 @@ def create_All_pd(data_ref, data_SNAC):
     return data_combined
 
 def compute_stat(data):
-    """ compute all basice stat on dataframe"""
+    """ compute all basic stat on dataframe"""
     idx = data.index
     idx_name1 = data.index.names[0]
     idx_name2 = data.index.names[1]
@@ -270,7 +272,7 @@ def compute_profile_exactitude_global(data_global = None, data_intra = None, dat
                            'FOS':['FOS_geq'],
                            }
     profil_param = ['eq_des','J','I','SCEr','SCEb','SCE_FI','N','n2','N_','var_r','var_b', 'var_FI', 'R','std_kr','std_kb', 'std_FI', 'std_IT', 'degree', 'k_tol', 'Rf', 'Itol_up_rel',
-                    'Itol_down_rel', 'biais_abs', 'biais_rel', 'Uc','k', 'U', 'U_rel']
+                    'Itol_down_rel', 'biais_abs', 'biais_rel', 'Uc','k', 'U', 'U_rel','error_real']
     # erase ancient profil param pd if any
     for i in data_inter_new.columns.levels[0].values:
         for ii in profil_param:
@@ -324,6 +326,7 @@ def compute_profile_exactitude_global(data_global = None, data_intra = None, dat
             k = np.nan # facteur d'elargissement
             U = np.nan # incertitude (elergie)
             U_rel = np.nan # relative uncertainty
+            error_real = np.nan # erreur à afficher au client
 
             try:
                 SNAC_mean = data_inter_new['SNAC_res_mean',param][i]
@@ -416,7 +419,7 @@ def compute_profile_exactitude_global(data_global = None, data_intra = None, dat
                 Itol_up_rel = (SNAC_mean + k_tol*std_IT)/Res_mean*100 # interval de tolerance
                 Itol_down_rel= (SNAC_mean- k_tol*std_IT)/Res_mean*100 # interval de tolerance
 
-                # computing the uncertainties
+                # computing the uncertainties and error to announce
                 Uc = std_IT
                 if np.isnan(k_tol):
                     k=1 # 2 for uncertainties (95%) - use 3 for uncertainty (99%)
@@ -424,6 +427,8 @@ def compute_profile_exactitude_global(data_global = None, data_intra = None, dat
                     k = k_tol  # use the k of accuracy profile
                 U = k * Uc
                 U_rel = U/SNAC_mean *100
+
+                error_real = max(abs(Itol_up_rel-100),abs(Itol_down_rel-100))  # relative uncertainty
 
                 for ii in profil_param:
                     if ii in locals():

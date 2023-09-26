@@ -53,14 +53,16 @@ Res_ref = round_value_pd(Res_ref_raw,decimals=3)
 
 Res_SNAC = round_value_pd(Res_SNAC_raw,decimals=3)
 
-list_name = {'506_VFA_geq_PLS': 'pls_VFA_geq',
+name_to_change = {'506_VFA_geq_PLS': 'pls_VFA_geq',
             '506_TAN_geq_PLS': 'pls_TAN_geq',
             '505_VFA_opt_sep1': 'sep_VFA1_geq',
             '505_VFA_opt_sep2': 'sep_VFA2_geq',
-            '505_TAN_opt_sep': 'sep_TAN_geq'}
-for i in list_name:
+            '505_TAN_opt_sep': 'sep_TAN_geq',
+             # '0_1': 'file', '0_2': 'SNAC_number'
+                  }
+for i in name_to_change:
     if i in Res_SNAC.columns:
-        Res_SNAC.rename(columns={i:list_name[i]}, inplace=True)
+        Res_SNAC.rename(columns={i:name_to_change[i]}, inplace=True)
 
 All_res_normal_raw = pd.concat([Res_ref, Res_SNAC], axis=1, keys=['reference data', 'SNAC data']) # erase "ok" in data reference
 
@@ -140,7 +142,12 @@ for i in ['VFA', 'TAN','IC', 'TAC', 'FOS','pls_VFA','pls_TAN']:
 # Select only interesting data
 interesting_columns=['VFA_geq','TAN_geq','IC_geq','FOS_geq','TAC_geq',
                     'pH_initial','conductivity_initial','pls_VFA_geq',
-                    'pls_TAN_geq','sep_VFA1_geq','sep_VFA2_geq','sep_TAN_geq']
+                     ]
+    # add automatically the columns whose name I changed (under the hypothesis that I need them)
+for i in name_to_change:
+    if name_to_change[i] not in interesting_columns:
+        interesting_columns.append(name_to_change[i])
+
 for i in Res_SNAC.columns:
     if i not in interesting_columns:
         Res_SNAC = Res_SNAC.drop(i, axis=1)
@@ -272,15 +279,31 @@ idx_all_ref = pd.MultiIndex.from_frame(idx_all, names=["Matrix", "Serie"])
 All_res_INTRAserie.set_index(idx_all_ref, inplace=True)
 
 
-# changing the index for FOS and TAC since they do not really have a reference I must use the mean of each condition
-for ref in ['FOS_ref', 'TAC_ref']:
-    pdd = pd.DataFrame(columns=['value'], index=All_res_twoindex.index)
+# changing the index for FOS and TAC : FOS since they do not really have a reference I must use the mean of each condition
+for ref in ['FOS_ref','TAC_ref']:
+    new = pd.DataFrame(columns=['value'], index=All_res_twoindex.index)
     for i in All_res_twoindex.index:
-        pdd['value'][i] = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2) # rounding by 3 means that any data is agregated
-    All_res_twoindex[ref+'_Serie'] = pdd
+        new['value'][i] = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2) # rounding by 3 means that no data is agregated
+    All_res_twoindex[ref+'_Serie'] = new
     All_res_twoindex.set_index(All_res_twoindex[ref+'_Serie'], drop=True, append=True, inplace=True)
     All_res_twoindex.drop(ref+'_Serie', axis=1, inplace=True)
 
+# # Agregate more TAC ref for AP analysis
+# for ref in ['TAC_ref']:
+#     new = pd.DataFrame(columns=['value'], index=All_res_twoindex.index)
+#     step = 0.25
+#     agr = np.arange(-1,31,step)# I use a bigger interval to not treat the limit case
+#     for i in All_res_twoindex.index:
+#         value = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2)
+#         for ii in range(0, agr.size):
+#             # print(ii) # select the right interval
+#             if (value >= agr[ii]-step/2) and (value < agr[ii]+step/2): # since it is filterd it goes up and only one condition is enough
+#                 new['value'][i] = agr[ii] # rounding by 3 means that no data is agregated
+#                 break
+#     All_res_twoindex[ref+'_Serie'] = new
+#     All_res_twoindex.set_index(All_res_twoindex[ref+'_Serie'], drop=True, append=True, inplace=True)
+#     All_res_twoindex.drop(ref+'_Serie', axis=1, inplace=True)
+#------
 
 # Analyse Profil d'exactitude
 """ source: 2010_Cahier_des_techniques dans WP05"""
@@ -372,7 +395,7 @@ for i in All_res_INTERserie_dict:
         # I put in a table the information of inter data to put  in the livrable.
 All_res_INTERserie_dict_metainfo = deepcopy(All_res_INTERserie_dict)
 ref_imp = {'VFA':['pls_VFA_geq'], 'TAN':['TAN_geq'], 'TAC':['TAC_geq']}
-parameter_imp = {'Ref_res_mean':1,'SNAC_res_std':3,'SNAC_res_mean':1,'SNAC_res_k':1,'SNAC_res_U':1,'SNAC_res_U_rel':0} # :'param' :  number --> decimel to round value
+parameter_imp = {'Ref_res_mean':1,'SNAC_res_std':3,'SNAC_res_mean':1,'SNAC_res_k':1,'SNAC_res_U':1,'SNAC_res_U_rel':0,'SNAC_res_error_real':0} # :'param' :  number --> decimel to round value
 #:format(count_pH_acid/count, ".0%" All_res_INTERserie_dict_metainfo[ref][param].style.format("{:.0%}")
 for ref in All_res_INTERserie_dict:
     if ref in ref_imp:
@@ -387,20 +410,6 @@ for ref in All_res_INTERserie_dict:
     else:
         del All_res_INTERserie_dict_metainfo[ref]
 
-# parameter_imp = {'SNAC_res_U_aggr':1,'SNAC_res_U_aggr_rel':1}
-# agrr = [[0,2],[2,5],[5,10],[10,20],[20,30]]
-# b=deepcopy(All_res_INTERserie_dict_metainfo)
-# c = b
-# for param in parameter_imp :
-#     for estimator in ['IC_geq', 'TAC_geq']:
-#         new = pd.DataFrame(columns=[param],index=c['TAC'].index)
-#         for i in new.index:
-#             if not np.isnan(c['TAC']['SNAC_res_U'][estimator].loc[i]):
-#                 for ii in agrr: # select the right interval
-#                     if (c['TAC']['SNAC_res_U'][estimator].loc[i] > ii[0]) and ( c['TAC']['SNAC_res_U'][estimator].loc[i] <= ii[1]):
-#                         sel = ii
-#                 new.loc[i][param] = c['TAC']['SNAC_res_U'][estimator].loc[(c['TAC']['SNAC_res_U'][estimator] > sel[0]) & (c['TAC']['SNAC_res_U'][estimator] <= sel[1])].median()
-#         c['TAC'][param,estimator] = new
 
 parameter_imp = {'SNAC_res_std_aggr':1,'SNAC_res_std_aggr_rel':1}
 agrr = [[0,2],[2,10],[10,30]]
@@ -412,11 +421,11 @@ for estimator in ['IC_geq', 'TAC_geq']:
     for i in new.index:
         if not np.isnan(i):
             for ii in agrr: # select the right interval
-                if (i > ii[0]) and (i <= ii[1]):
+                if (i >= ii[0]) and (i < ii[1]):
                     sel = ii
                     break
-            print('value: '+str(i))
-            print('agre: '+str(sel))
+            # print('value: '+str(i))
+            # print('agre: '+str(sel))
             selected_data = c['TAC'].loc[(c['TAC']['SNAC_res_std'][estimator].index > sel[0]) & (c['TAC']['SNAC_res_std'][estimator].index <= sel[1])]
             observed_mean = selected_data['SNAC_res_mean'][estimator].mean()
             new.loc[i]['SNAC_res_std_aggr'] = selected_data['SNAC_res_std'][estimator].median() #obseved std median of selected data
