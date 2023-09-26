@@ -280,7 +280,7 @@ All_res_INTRAserie.set_index(idx_all_ref, inplace=True)
 
 
 # changing the index for FOS and TAC : FOS since they do not really have a reference I must use the mean of each condition
-for ref in ['FOS_ref','TAC_ref']:
+for ref in ['FOS_ref']:
     new = pd.DataFrame(columns=['value'], index=All_res_twoindex.index)
     for i in All_res_twoindex.index:
         new['value'][i] = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2) # rounding by 3 means that no data is agregated
@@ -288,21 +288,21 @@ for ref in ['FOS_ref','TAC_ref']:
     All_res_twoindex.set_index(All_res_twoindex[ref+'_Serie'], drop=True, append=True, inplace=True)
     All_res_twoindex.drop(ref+'_Serie', axis=1, inplace=True)
 
-# # Agregate more TAC ref for AP analysis
-# for ref in ['TAC_ref']:
-#     new = pd.DataFrame(columns=['value'], index=All_res_twoindex.index)
-#     step = 0.25
-#     agr = np.arange(-1,31,step)# I use a bigger interval to not treat the limit case
-#     for i in All_res_twoindex.index:
-#         value = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2)
-#         for ii in range(0, agr.size):
-#             # print(ii) # select the right interval
-#             if (value >= agr[ii]-step/2) and (value < agr[ii]+step/2): # since it is filterd it goes up and only one condition is enough
-#                 new['value'][i] = agr[ii] # rounding by 3 means that no data is agregated
-#                 break
-#     All_res_twoindex[ref+'_Serie'] = new
-#     All_res_twoindex.set_index(All_res_twoindex[ref+'_Serie'], drop=True, append=True, inplace=True)
-#     All_res_twoindex.drop(ref+'_Serie', axis=1, inplace=True)
+# Agregate more TAC ref for AP analysis
+for ref in ['TAC_ref']:
+    new = pd.DataFrame(columns=['value'], index=All_res_twoindex.index)
+    step = 0.3
+    agr = np.arange(0-step,31,step, dtype=float)# I use a bigger interval to not treat the limit case
+    for i in All_res_twoindex.index:
+        value = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2)
+        for ii in range(0, agr.size):
+            # print(ii) # select the right interval
+            if (value >= agr[ii]-step/2) and (value < agr[ii]+step/2): # since it is filterd it goes up and only one condition is enough
+                new['value'][i] = round(agr[ii],2)
+                break
+    All_res_twoindex[ref+'_Serie'] = new
+    All_res_twoindex.set_index(All_res_twoindex[ref+'_Serie'], drop=True, append=True, inplace=True)
+    All_res_twoindex.drop(ref+'_Serie', axis=1, inplace=True)
 #------
 
 # Analyse Profil d'exactitude
@@ -419,13 +419,12 @@ for estimator in ['IC_geq', 'TAC_geq']:
     new = pd.DataFrame(columns=['SNAC_res_std_aggr'],index=c['TAC'].index)
     new_rel = pd.DataFrame(columns=['SNAC_res_std_aggr_rel'], index=c['TAC'].index)
     for i in new.index:
+        print(i)
         if not np.isnan(i):
             for ii in agrr: # select the right interval
                 if (i >= ii[0]) and (i < ii[1]):
                     sel = ii
                     break
-            # print('value: '+str(i))
-            # print('agre: '+str(sel))
             selected_data = c['TAC'].loc[(c['TAC']['SNAC_res_std'][estimator].index > sel[0]) & (c['TAC']['SNAC_res_std'][estimator].index <= sel[1])]
             observed_mean = selected_data['SNAC_res_mean'][estimator].mean()
             new.loc[i]['SNAC_res_std_aggr'] = selected_data['SNAC_res_std'][estimator].median() #obseved std median of selected data

@@ -538,6 +538,27 @@ def initialize_param():
     biais_rel = np.nan
     return
 
+# def estimator_agregation(reference=['TAC_ref'], type='range', data_loop=data_l, data_calc=data_c, others=None):
+#     """this function create reference vector allowing the agregation of data following different rules:
+#     average, imposed range, round, etc"""
+#     if type == 'range':
+#         for ref in reference:
+#             new = pd.DataFrame(columns=['value'], index=All_res_twoindex.index)
+#             step = 0.5
+#             agr = np.arange(-1, 31, step)  # I use a bigger interval to not treat the limit case
+#             for i in All_res_twoindex.index:
+#                 value = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2)
+#                 for ii in range(0, agr.size):
+#                     # print(ii) # select the right interval
+#                     if (value >= agr[ii] - step / 2) and (
+#                             value < agr[ii] + step / 2):  # since it is filterd it goes up and only one condition is enough
+#                         new['value'][i] = agr[ii]  # rounding by 3 means that no data is agregated
+#                         break
+#             All_res_twoindex[ref + '_Serie'] = new
+#             All_res_twoindex.set_index(All_res_twoindex[ref + '_Serie'], drop=True, append=True, inplace=True)
+#             All_res_twoindex.drop(ref + '_Serie', axis=1, inplace=True)
+#     return
+
 
 
 

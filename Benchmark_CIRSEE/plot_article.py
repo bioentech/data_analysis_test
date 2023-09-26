@@ -643,8 +643,8 @@ def standard_plot_new(data,dict_param,param,path,save_name):
 def plot_exactitude_general(data, dict_param, param, path, save_name):
     logging.info(param)
     param_ref = param # we do that becaus the IC has no reference values and we use TAC for comparison
-    if param == 'IC'or param == 'TAC':
-        param_ref = 'TAC_fostac'
+    # if param == 'IC'or param == 'TAC':
+    #     param_ref = 'TAC_fostac'
     Y = param + '_geq'
     X = param_ref + '_ref'
     if 'X' in dict_param[param]:
