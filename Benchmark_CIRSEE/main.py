@@ -139,6 +139,9 @@ for i in ['VFA', 'TAN','IC', 'TAC', 'FOS','pls_VFA','pls_TAN']:
     All_res_normal_metainfo[i]['result not provided'] = len(Res_SNAC[Res_SNAC[i+'_geq'].isna()].index.tolist())
     All_res_normal_metainfo[i]['result provided'] = Res_SNAC[i+'_geq'].size - All_res_normal_metainfo[i]['result not provided']
 
+
+#All_res_twoindex = two_index_creation()
+
 # Select only interesting data
 interesting_columns=['VFA_geq','TAN_geq','IC_geq','FOS_geq','TAC_geq',
                     'pH_initial','conductivity_initial','pls_VFA_geq',
@@ -193,116 +196,21 @@ All_res_twoindex = pd.concat([Res_ref_twoindex,Res_SNAC_twoindex],
 All_res_twoindex.index.set_names(["Serie", "Repetition"], level=[0,1], inplace=True)
 
 # add corrected FOS
-All_res_twoindex['Res_SNAC','corr_FOS_geq'] = (All_res_twoindex['Res_SNAC']['FOS_geq'] - 1.01)/1.33 # 1.01 et 1.33 sont issus de la regression linéaire
-All_res_twoindex['Res_SNAC']['corr_FOS_geq'][All_res_twoindex['Res_SNAC']['corr_FOS_geq']<0] = 0 # si c'est negatif après correction il faut mettre zzro car pas de sens sinon
+# All_res_twoindex['Res_SNAC','corr_FOS_geq'] = (All_res_twoindex['Res_SNAC']['FOS_geq'] - 1.01)/1.33 # 1.01 et 1.33 sont issus de la regression linéaire
+# All_res_twoindex['Res_SNAC']['corr_FOS_geq'][All_res_twoindex['Res_SNAC']['corr_FOS_geq']<0] = 0 # si c'est negatif après correction il faut mettre zzro car pas de sens sinon
+#
+# All_res_twoindex['Res_SNAC','corr_Hach_FOS_geq'] = (All_res_twoindex['Res_ref']['FOS_ref'] - 1.16)/0.81 # 1.01 et 1.33 sont issus de la regression linéaire
+# All_res_twoindex['Res_SNAC']['corr_Hach_FOS_geq'][All_res_twoindex['Res_SNAC']['corr_Hach_FOS_geq']<0] = 0 # si c'est negatif après correction il faut mettre zzro car pas de sens sinon
 
-All_res_twoindex['Res_SNAC','corr_Hach_FOS_geq'] = (All_res_twoindex['Res_ref']['FOS_ref'] - 1.16)/0.81 # 1.01 et 1.33 sont issus de la regression linéaire
-All_res_twoindex['Res_SNAC']['corr_Hach_FOS_geq'][All_res_twoindex['Res_SNAC']['corr_Hach_FOS_geq']<0] = 0 # si c'est negatif après correction il faut mettre zzro car pas de sens sinon
 
-
-
-    # add several index for inter intra seria
-for iii in All_res_twoindex.loc[:, 'Res_ref']:
-    if iii not in ['TAC_ref', 'FOS_ref']: # I compute these later since they are alread the reference
-        All_res_twoindex.insert(0, iii + '_Serie', round_value_serie(All_res_twoindex.loc[:, 'Res_ref'][iii], decimals=value_round))
-        All_res_twoindex.set_index(All_res_twoindex[iii + '_Serie'], drop=True,append=True, inplace=True)
-        All_res_twoindex.drop(iii + '_Serie', axis =1, inplace=True)
-
+#create multindex
+All_res_multiindex = multiindex_analysis_simple(All_res_twoindex,value_round)
 
 # computing mean and standard deviations INTRA serie
-Res_ref_std = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
-Res_ref_mean = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
-Res_ref_median = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
-Res_ref_SCE = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
-Res_ref_nb = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
-Res_ref_CV = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
+All_res_INTRAserie = INTRA_analysis (All_res_multiindex,idx1_ref,idx1)
 
-for i in All_res_twoindex.index.levels[0]:
-    for ii in All_res_twoindex['Res_ref'].columns:
-        Res_ref_std.loc[i,ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_ref', axis=1)[ii].std()
-        Res_ref_mean.loc[i,ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_ref', axis=1)[ii].mean()
-        Res_ref_median.loc[i,ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_ref', axis=1)[ii].median()
-        Res_ref_SCE.loc[i,ii] = ((All_res_twoindex.xs(i, level='Serie').xs('Res_ref', axis=1)[ii] - Res_ref_mean.loc[i, ii])**2).sum()
-        Res_ref_nb.loc[i,ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_ref', axis=1)[ii].count()
-        Res_ref_CV.loc[i,ii] = Res_ref_std.loc[i,ii]/Res_ref_mean.loc[i,ii] * 100 # coefficient de variation
-Res_ref_std.loc[:,'VFA_ref'] = np.nan # VFA, TAN n'ont pas de std car c'est une seule valeur repetée
-Res_ref_std.loc[:,'TAN_ref'] = np.nan
-
-# computing stat variables in Res_SNAC
-Res_SNAC_std = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
-Res_SNAC_mean = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
-Res_SNAC_median = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
-Res_SNAC_SCE = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
-Res_SNAC_nb = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
-Res_SNAC_CV = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
-for i in idx1.drop_duplicates()['index']:
-    for ii in All_res_twoindex['Res_SNAC'].columns:
-        Res_SNAC_std.loc[i,ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_SNAC', axis=1)[ii].std()
-        Res_SNAC_mean.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_SNAC', axis=1)[ii].mean()
-        Res_SNAC_median.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_SNAC', axis=1)[ii].median()
-        Res_SNAC_SCE.loc[i, ii] = ((All_res_twoindex.xs(i, level='Serie').xs('Res_SNAC', axis=1)[ii] - Res_SNAC_mean.loc[i, ii])**2).sum()
-        Res_SNAC_nb.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_SNAC', axis=1)[ii].count()
-        Res_SNAC_CV.loc[i, ii] = Res_SNAC_std.loc[i,ii]/Res_SNAC_mean.loc[i, ii] * 100 # coefficient de variation
-
-# # Creating results table
-
-# All_res_normal = pd.concat([Res_ref_mean,Res_SNAC_mean,Res_SNAC_std,], axis=1, verify_integrity = True, keys=['Ref_res','SNAC_res_mean','SNAC_res_std'])
-All_res_INTRAserie = pd.concat([Res_ref_mean,
-                            Res_ref_std,
-                            Res_ref_median,
-                            Res_ref_SCE,
-                            Res_SNAC_mean,
-                            Res_SNAC_std,
-                            Res_SNAC_median,
-                            Res_SNAC_SCE,
-                            Res_SNAC_nb], axis=1, verify_integrity = True,
-                           keys=['Ref_res_mean',
-                                 'Ref_res_std',
-                                 'Ref_res_median',
-                                 'Ref_res_SCE',
-                                 'SNAC_res_mean',
-                                 'SNAC_res_std',
-                                 'SNAC_res_median',
-                                 'SNAC_res_SCE',
-                                 'SNAC_res_nb'])
-
-#   providing multindex to Res_ref
-idx2_all = pd.DataFrame(All_res_INTRAserie.index.copy(deep=True))
-idx1_all = pd.DataFrame(All_res_INTRAserie.index.copy(deep=True))
-i=0
-for test in idx2_all[0]:
-    end = test.index('_')
-    idx1_all[0][i] = test[0:end]
-    i = i + 1
-idx_all = pd.concat([idx1_all, idx2_all], axis=1)
-idx_all_ref = pd.MultiIndex.from_frame(idx_all, names=["Matrix", "Serie"])
-All_res_INTRAserie.set_index(idx_all_ref, inplace=True)
-
-
-# changing the index for FOS and TAC : FOS since they do not really have a reference I must use the mean of each condition
-for ref in ['FOS_ref']:
-    new = pd.DataFrame(columns=['value'], index=All_res_twoindex.index)
-    for i in All_res_twoindex.index:
-        new['value'][i] = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2) # rounding by 3 means that no data is agregated
-    All_res_twoindex[ref+'_Serie'] = new
-    All_res_twoindex.set_index(All_res_twoindex[ref+'_Serie'], drop=True, append=True, inplace=True)
-    All_res_twoindex.drop(ref+'_Serie', axis=1, inplace=True)
-
-# Agregate more TAC ref for AP analysis
-for ref in ['TAC_ref']:
-    new = pd.DataFrame(columns=['value'], index=All_res_twoindex.index)
-    step = 0.3
-    agr = np.arange(0-step,31,step, dtype=float)# I use a bigger interval to not treat the limit case
-    for i in All_res_twoindex.index:
-        value = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2)
-        for ii in range(0, agr.size):
-            # print(ii) # select the right interval
-            if (value >= agr[ii]-step/2) and (value < agr[ii]+step/2): # since it is filterd it goes up and only one condition is enough
-                new['value'][i] = round(agr[ii],2)
-                break
-    All_res_twoindex[ref+'_Serie'] = new
-    All_res_twoindex.set_index(All_res_twoindex[ref+'_Serie'], drop=True, append=True, inplace=True)
-    All_res_twoindex.drop(ref+'_Serie', axis=1, inplace=True)
+# create multindex
+All_res_multiindex = multiindex_analysis_specific(All_res_multiindex,All_res_INTRAserie,value_round)
 #------
 
 # Analyse Profil d'exactitude
@@ -312,143 +220,120 @@ for ref in ['TAC_ref']:
 
 
 # creating dataframe with data INTER serie
-All_res_ALLserie = deepcopy(All_res_twoindex)
-All_res_ALLserie_dict ={}
-All_res_ALLserie_dict_raw ={}
-All_res_INTERserie_dict ={}
-All_res_INTERserie_dict_raw ={}
-dict_param_relation = {'VFA': ['VFA_geq', 'pls_VFA_geq', 'FOS_geq','corr_FOS_geq','corr_Hach_FOS_geq','sep_VFA1_geq','sep_VFA2_geq'],  # ref : [all param with this ref]
+dict_param_relation = {'VFA': ['VFA_geq', 'pls_VFA_geq', 'FOS_geq','sep_VFA1_geq','sep_VFA2_geq'],  # ref : [all param with this ref]
                        'TAN': ['TAN_geq', 'pls_TAN_geq','sep_TAN_geq'],
                        'TAC': ['TAC_geq', 'IC_geq'],
                        'FOS': ['FOS_geq'],
                        }
-for i in All_res_ALLserie.xs('Res_ref',axis=1).columns:
-    param = i.replace('_ref','')
-    Res_param = deepcopy(All_res_ALLserie)
-    Res_param = erase_unusefull_info(Res_param, param) # erase not used info in specific pd param
-    for ii in Res_param.index.names:
-        if ii not in['Serie', 'Repetition',i+'_Serie']:
-            Res_param.reset_index(level=ii, drop=True, inplace= True)
-    Res_param = Res_param.swaplevel(i=-3, j=-1)
-    Res_param = Res_param.swaplevel(i=-2, j=-1)
+All_res_ALLserie_dict, All_res_ALLserie_dict_raw, All_res_INTERserie_dict, All_res_INTERserie_dict_raw = INTER_analysis(All_res_multiindex,All_res_INTRAserie, dict_param_relation)
 
-    All_res_ALLserie_dict_raw[param] = deepcopy(All_res_ALLserie)
-    # All_res_ALLserie_dict_raw[param] = erase_unusefull_info(All_res_ALLserie_dict_raw[param], param)
-    All_res_ALLserie_dict_raw[param].sort_index(level=-1, ascending=True, inplace=True,na_position='last')
+# metainfo
+All_res_INTERserie_dict_metainfo = metainfo(All_res_INTERserie_dict)
 
-    All_res_ALLserie_dict[param] = pd.DataFrame()
-    All_res_ALLserie_dict[param] = compute_stat(Res_param)
-    #All_res_ALLserie_dict[param] = compute_profile_exactitude_simplified(All_res_ALLserie_dict[param], param)
-    All_res_ALLserie_dict[param] = compute_profile_exactitude_global(data_global = All_res_twoindex, data_intra = All_res_INTRAserie,
-                                                                     data_all = All_res_ALLserie_dict[param], ref = param, eq_des = None, serie='no')
-    All_res_ALLserie_dict[param].sort_index(level=-1, ascending=True, inplace=True, na_position='last')
+#### repeat all code for corrected values #################
+# correction estimators with linear regression
+dict_param_relation_Corr = {}
+corr_factor = pd.DataFrame(columns=['Param','Estimator','a','b','R2'])
+for param in dict_param_relation:
+    if param in All_res_INTERserie_dict:
+        dict_param_relation_Corr[param]=[]
+        ref = param+'_ref'
+        X = All_res_INTERserie_dict[param]['Ref_res_mean',ref]
+        for estimator in dict_param_relation[param]:
+            if estimator in All_res_INTERserie_dict[param]['SNAC_res_mean'].columns:
+                Y = All_res_INTERserie_dict[param]['SNAC_res_mean',estimator]
+                reg, R2, coef, intercept = linear_regression(x=X, y=Y)
+                index = param+'-'+estimator
+                corr_factor.loc[index,'Param'] = param
+                corr_factor.loc[index,'Estimator'] = estimator
+                corr_factor.loc[index,'a'] = round(coef[0][0],2)
+                corr_factor.loc[index,'b'] = round(intercept[0], 2)
+                corr_factor.loc[index,'R2'] = format(R2, ".0%")
+                dict_param_relation_Corr[param].append('corr_'+estimator)
+#
+# correction estimators with linear regression
+All_res_twoindex_Corr=deepcopy(All_res_twoindex) # it is a multilevel dataframe
+for param in dict_param_relation:
+    for estimator in dict_param_relation[param]:
+        if estimator in All_res_twoindex_Corr['Res_SNAC']:
+            index = param + '-' + estimator
+            a = corr_factor.loc[index, 'a']
+            b = corr_factor.loc[index, 'b']
+            All_res_twoindex_Corr.drop(columns=estimator, level=1, inplace=True)
+            All_res_twoindex_Corr['Res_SNAC', estimator] = (All_res_twoindex['Res_SNAC'][estimator] - b) / a
+            All_res_twoindex_Corr['Res_SNAC'][estimator][All_res_twoindex['Res_SNAC'][estimator] < 0] = 0 # si c'est negatif après correction il faut mettre zzro car pas de sens sinon
 
-    All_res_INTERserie_dict[param] = compute_profile_exactitude_global(data_global = All_res_twoindex, data_intra = All_res_INTRAserie,
-                                                                       data_all = All_res_ALLserie_dict[param], ref = param, eq_des = None, serie='yes')
+#create multindex
+All_res_multiindex_Corr = multiindex_analysis_simple(All_res_twoindex_Corr,value_round)
+
+# computing mean and standard deviations INTRA serie
+All_res_INTRAserie_Corr = INTRA_analysis (All_res_twoindex_Corr,idx1_ref,idx1)
+
+# create multindex
+All_res_multiindex_Corr = multiindex_analysis_specific(All_res_multiindex_Corr,All_res_INTRAserie_Corr,value_round)
+
+# Accuracy profile analysis
+All_res_ALLserie_dict_Corr, All_res_ALLserie_dict_raw_Corr, All_res_INTERserie_dict_Corr, All_res_INTERserie_dict_raw_Corr = INTER_analysis(All_res_multiindex_Corr,All_res_INTRAserie_Corr, dict_param_relation_Corr)
+
+# metainfo
+All_res_INTERserie_dict_metainfo_Corr = metainfo(All_res_INTERserie_dict_Corr)
+
 
 # creating/emptying output folder
 import shutil
 if os.path.exists(output_folder_path):
     shutil.rmtree(output_folder_path)
 os.makedirs(output_folder_path)
+
+raw_output_folder_path = os.path.join(output_folder_path,'raw')
+corr_output_folder_path = os.path.join(output_folder_path,'corr')
+
 # I create different folder for all the types of data
-intra_path = os.path.join(output_folder_path, 'intra')
-inter_path = os.path.join(output_folder_path, 'inter')
-all_path = os.path.join(output_folder_path, 'all')
+raw_intra_path = os.path.join(raw_output_folder_path, 'intra')
+raw_inter_path = os.path.join(raw_output_folder_path, 'inter')
+raw_all_path = os.path.join(raw_output_folder_path, 'all')
 for i in ['intra','inter','all']:
-    os.makedirs(os.path.join(output_folder_path,i,'image'))
-    os.makedirs(os.path.join(output_folder_path,i,'image_pls'))
+    os.makedirs(os.path.join(raw_output_folder_path, i,'image'))
+    os.makedirs(os.path.join(raw_output_folder_path,i,'image_pls'))
 
-    
+corr_intra_path = os.path.join(corr_output_folder_path, 'intra')
+corr_inter_path = os.path.join(corr_output_folder_path, 'inter')
+corr_all_path = os.path.join(corr_output_folder_path, 'all')
+for i in ['intra','inter','all']:
+    os.makedirs(os.path.join(corr_output_folder_path,i,'image'))
+    os.makedirs(os.path.join(corr_output_folder_path,i,'image_pls'))
+
+
 # SAVING IN EXCEL
-    # put something else in the metainfo
-All_res_normal_metainfo['All']['Total conditions'] = All_res_INTRAserie.shape[0] # we need to keep all the analysis in the data reference
-# I need to trier with for loop since I cannot do it with index
-for i in ['T1','T2','T3','T4']:
-    All_res_normal_metainfo[i]['Total conditions'] = All_res_INTRAserie.loc[i,:].shape[0]
-    logging.info('creating meta info from All_res_normal. not valid for other files input')
+save_Excel(All_res_normal_metainfo,All_res_INTRAserie,All_res_normal_raw,All_res_ALLserie_dict,
+               All_res_INTERserie_dict, All_res_INTERserie_dict_metainfo, All_res_INTERserie_dict_raw,
+               raw_output_folder_path,file_SNAC)
 
-    # Saving results table
-All_res_normal = truncate_value_pd(All_res_INTRAserie,decimals=3)
-All_res_normal_raw = truncate_value_pd(All_res_normal_raw,decimals=3)
+# SAVING IN EXCEL
+save_Excel(All_res_normal_metainfo, All_res_INTRAserie_Corr,All_res_normal_raw, All_res_ALLserie_dict_Corr,
+               All_res_INTERserie_dict_Corr, All_res_INTERserie_dict_metainfo_Corr, All_res_INTERserie_dict_raw_Corr,
+               corr_output_folder_path,file_SNAC)
 
-    # save all data with specific analysis
-writer = pd.ExcelWriter(output_folder_path + file_SNAC.replace('.csv','') +' intra_results.xlsx')
-All_res_normal_raw.to_excel(writer, sheet_name = 'res_raw',startcol=1, startrow=1, freeze_panes=(3,2))
-All_res_normal.to_excel(writer, sheet_name = 'res_analysed',startcol=1, startrow=1, freeze_panes=(3,2))
-All_res_normal_metainfo.to_excel(writer, sheet_name = 'metainfo',startcol=1, startrow=1, freeze_panes=(2,2))
+# save corrective factor
+writer = pd.ExcelWriter(corr_output_folder_path + file_SNAC.replace('.csv', '') + ' corrective factors.xlsx')
+round_value_pd(corr_factor, decimals=2).to_excel(writer, startcol=1, startrow=1,freeze_panes=(3, 2))
 writer.save()
 writer.close()
 
-    # save all data with global analysis
-writer = pd.ExcelWriter(output_folder_path + file_SNAC.replace('.csv','') +' all_results.xlsx')
-for i in All_res_ALLserie_dict:
-    round_value_pd(All_res_ALLserie_dict[i], decimals=2).to_excel(writer, sheet_name = str(i),startcol=1, startrow=1, freeze_panes=(3,2))
-writer.save()
-writer.close()
+logging.info('Saving data ended correctly')
 
-    # save all data with inter serie analysis (complete analysis)
-writer = pd.ExcelWriter(output_folder_path + file_SNAC.replace('.csv','') +' inter_results.xlsx')
-for i in All_res_INTERserie_dict:
-    round_value_pd(All_res_INTERserie_dict[i], decimals=2).to_excel(writer, sheet_name = str(i),startcol=1, startrow=1, freeze_panes=(3,3))
-
-        # I put in a table the information of inter data to put  in the livrable.
-All_res_INTERserie_dict_metainfo = deepcopy(All_res_INTERserie_dict)
-ref_imp = {'VFA':['pls_VFA_geq'], 'TAN':['TAN_geq'], 'TAC':['TAC_geq']}
-parameter_imp = {'Ref_res_mean':1,'SNAC_res_std':3,'SNAC_res_mean':1,'SNAC_res_k':1,'SNAC_res_U':1,'SNAC_res_U_rel':0,'SNAC_res_error_real':0} # :'param' :  number --> decimel to round value
-#:format(count_pH_acid/count, ".0%" All_res_INTERserie_dict_metainfo[ref][param].style.format("{:.0%}")
-for ref in All_res_INTERserie_dict:
-    if ref in ref_imp:
-        for param in All_res_INTERserie_dict[ref].columns.levels[0].values:
-            if param not in parameter_imp:
-                del All_res_INTERserie_dict_metainfo[ref][param]
-            else:#todo : it does not work for now
-                All_res_INTERserie_dict_metainfo[ref][param]=round_value_pd(All_res_INTERserie_dict_metainfo[ref][param], decimals=parameter_imp[param])
-                for estimator in All_res_INTERserie_dict_metainfo[ref][param]:
-                    if estimator not in ref_imp[ref]:
-                        del All_res_INTERserie_dict_metainfo[ref][param][estimator]
-    else:
-        del All_res_INTERserie_dict_metainfo[ref]
-
-
-parameter_imp = {'SNAC_res_std_aggr':1,'SNAC_res_std_aggr_rel':1}
-agrr = [[0,2],[2,10],[10,30]]
-# b=deepcopy(All_res_INTERserie_dict_metainfo)
-c = All_res_INTERserie_dict_metainfo
-for estimator in ['IC_geq', 'TAC_geq']:
-    new = pd.DataFrame(columns=['SNAC_res_std_aggr'],index=c['TAC'].index)
-    new_rel = pd.DataFrame(columns=['SNAC_res_std_aggr_rel'], index=c['TAC'].index)
-    for i in new.index:
-        print(i)
-        if not np.isnan(i):
-            for ii in agrr: # select the right interval
-                if (i >= ii[0]) and (i < ii[1]):
-                    sel = ii
-                    break
-            selected_data = c['TAC'].loc[(c['TAC']['SNAC_res_std'][estimator].index > sel[0]) & (c['TAC']['SNAC_res_std'][estimator].index <= sel[1])]
-            observed_mean = selected_data['SNAC_res_mean'][estimator].mean()
-            new.loc[i]['SNAC_res_std_aggr'] = selected_data['SNAC_res_std'][estimator].median() #obseved std median of selected data
-            new_rel.loc[i]['SNAC_res_std_aggr_rel'] = format(new.loc[i]['SNAC_res_std_aggr']/ observed_mean, ".1%")
-    c['TAC']['SNAC_res_std_aggr',estimator] = new
-    c['TAC']['SNAC_res_std_aggr_rel', estimator] = new_rel
-
-
-for i in All_res_INTERserie_dict_metainfo:
-    All_res_INTERserie_dict_metainfo[i].to_excel(writer, sheet_name = i+' metainfo',startcol=1, startrow=1, freeze_panes=(3,3))
-
-for i in All_res_INTERserie_dict_raw:
-    round_value_pd(All_res_INTERserie_dict_raw[i], decimals=2).to_excel(writer, sheet_name=str(i), startcol=1, startrow=1, freeze_panes=(3, 3))
-
-writer.save()
-writer.close()
-
-logging.info('Files saved correctly')
 
 ##### PLOTTING ######
 
 # plot_Benchmark_param(All_res_ALLserie_dict, all_path, truncate_value_pd(Res_SNAC_raw,decimals=1), Res_SNAC_twoindex)
-plot_Benchmark(All_res_INTRAserie, intra_path, truncate_value_pd(Res_SNAC_raw,decimals=1), Res_SNAC_twoindex)
-plot_Benchmark_param(All_res_INTERserie_dict, inter_path, truncate_value_pd(Res_SNAC_raw,decimals=1), Res_SNAC_twoindex)
+# plot_Benchmark(All_res_INTRAserie, raw_intra_path, truncate_value_pd(Res_SNAC_raw,decimals=1))
+plot_Benchmark_param(All_res_INTERserie_dict, raw_inter_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression = corr_factor)
+logging.info('Plotting raw data ended correctly')
+
+# plot_Benchmark(All_res_INTRAserie_Corr, corr_intra_path, truncate_value_pd(Res_SNAC_raw,decimals=1))
+plot_Benchmark_param(All_res_INTERserie_dict_Corr, corr_inter_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression = 'yes' )
+logging.info('Plotting corrected data ended correctly')
+
 
 logging.info('Analysis ended correctly')
 

@@ -7,10 +7,166 @@ from copy import deepcopy
 from sklearn import datasets, linear_model
 from sklearn.metrics import mean_squared_error, r2_score
 
-def linear_regression(X=None, Y=None):
+
+def two_index_creation():
+    return
+def INTRA_analysis(All_res_twoindex,idx1_ref,idx1):
+    # computing mean and standard deviations INTRA serie
+    Res_ref_std = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
+    Res_ref_mean = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
+    Res_ref_median = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
+    Res_ref_SCE = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
+    Res_ref_nb = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
+    Res_ref_CV = pd.DataFrame(columns=All_res_twoindex['Res_ref'].columns, index=idx1_ref['nom'].drop_duplicates())
+
+    for i in All_res_twoindex.index.levels[0]:
+        for ii in All_res_twoindex['Res_ref'].columns:
+            Res_ref_std.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_ref', axis=1)[ii].std()
+            Res_ref_mean.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_ref', axis=1)[ii].mean()
+            Res_ref_median.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_ref', axis=1)[ii].median()
+            Res_ref_SCE.loc[i, ii] = ((All_res_twoindex.xs(i, level='Serie').xs('Res_ref', axis=1)[ii] - Res_ref_mean.loc[i, ii]) ** 2).sum()
+            Res_ref_nb.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_ref', axis=1)[ii].count()
+            Res_ref_CV.loc[i, ii] = Res_ref_std.loc[i, ii] / Res_ref_mean.loc[i, ii] * 100  # coefficient de variation
+    Res_ref_std.loc[:, 'VFA_ref'] = np.nan  # VFA, TAN n'ont pas de std car c'est une seule valeur repetée
+    Res_ref_std.loc[:, 'TAN_ref'] = np.nan
+
+    # computing stat variables in Res_SNAC
+    Res_SNAC_std = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
+    Res_SNAC_mean = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
+    Res_SNAC_median = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
+    Res_SNAC_SCE = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
+    Res_SNAC_nb = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
+    Res_SNAC_CV = pd.DataFrame(columns=All_res_twoindex['Res_SNAC'].columns, index=idx1['index'].drop_duplicates())
+    for i in idx1.drop_duplicates()['index']:
+        for ii in All_res_twoindex['Res_SNAC'].columns:
+            Res_SNAC_std.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_SNAC', axis=1)[ii].std()
+            Res_SNAC_mean.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_SNAC', axis=1)[ii].mean()
+            Res_SNAC_median.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_SNAC', axis=1)[ii].median()
+            Res_SNAC_SCE.loc[i, ii] = ((All_res_twoindex.xs(i, level='Serie').xs('Res_SNAC', axis=1)[ii] -
+                                        Res_SNAC_mean.loc[i, ii]) ** 2).sum()
+            Res_SNAC_nb.loc[i, ii] = All_res_twoindex.xs(i, level='Serie').xs('Res_SNAC', axis=1)[ii].count()
+            Res_SNAC_CV.loc[i, ii] = Res_SNAC_std.loc[i, ii] / Res_SNAC_mean.loc[
+                i, ii] * 100  # coefficient de variation
+
+    # # Creating results table
+
+    # All_res_normal = pd.concat([Res_ref_mean,Res_SNAC_mean,Res_SNAC_std,], axis=1, verify_integrity = True, keys=['Ref_res','SNAC_res_mean','SNAC_res_std'])
+    All_res_INTRAserie = pd.concat([Res_ref_mean,
+                                    Res_ref_std,
+                                    Res_ref_median,
+                                    Res_ref_SCE,
+                                    Res_SNAC_mean,
+                                    Res_SNAC_std,
+                                    Res_SNAC_median,
+                                    Res_SNAC_SCE,
+                                    Res_SNAC_nb], axis=1, verify_integrity=True,
+                                   keys=['Ref_res_mean',
+                                         'Ref_res_std',
+                                         'Ref_res_median',
+                                         'Ref_res_SCE',
+                                         'SNAC_res_mean',
+                                         'SNAC_res_std',
+                                         'SNAC_res_median',
+                                         'SNAC_res_SCE',
+                                         'SNAC_res_nb'])
+
+    #   providing multindex to Res_ref
+    idx2_all = pd.DataFrame(All_res_INTRAserie.index.copy(deep=True))
+    idx1_all = pd.DataFrame(All_res_INTRAserie.index.copy(deep=True))
+    i = 0
+    for test in idx2_all[0]:
+        end = test.index('_')
+        idx1_all[0][i] = test[0:end]
+        i = i + 1
+    idx_all = pd.concat([idx1_all, idx2_all], axis=1)
+    idx_all_ref = pd.MultiIndex.from_frame(idx_all, names=["Matrix", "Serie"])
+    All_res_INTRAserie.set_index(idx_all_ref, inplace=True)
+
+    return All_res_INTRAserie
+
+def multiindex_analysis_simple(All_res_twoindex,value_round):
+    # add several index for inter intra seria
+    All_res_multiindex = deepcopy(All_res_twoindex)
+    for iii in All_res_multiindex.loc[:, 'Res_ref']:
+        if iii not in ['TAC_ref', 'FOS_ref']:  # I compute these later since they are already the reference
+            All_res_multiindex.insert(0, iii + '_Serie', round_value_serie(All_res_multiindex.loc[:, 'Res_ref'][iii],
+                                                                           decimals=value_round))
+            All_res_multiindex.set_index(All_res_multiindex[iii + '_Serie'], drop=True, append=True, inplace=True)
+            All_res_multiindex.drop(iii + '_Serie', axis=1, inplace=True)
+    return All_res_multiindex
+def multiindex_analysis_specific(All_res_multiindex, All_res_INTRAserie, value_round):
+    # changing the index for FOS and TAC : FOS since they do not really have a reference I must use the mean of each condition
+    for ref in ['FOS_ref']:
+        new = pd.DataFrame(columns=['value'], index=All_res_multiindex.index)
+        for i in All_res_multiindex.index:
+            new['value'][i] = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0],
+                                    2)  # rounding by 3 means that no data is agregated
+        All_res_multiindex[ref + '_Serie'] = new
+        All_res_multiindex.set_index(All_res_multiindex[ref + '_Serie'], drop=True, append=True, inplace=True)
+        All_res_multiindex.drop(ref + '_Serie', axis=1, inplace=True)
+
+    # Agregate more TAC ref for AP analysis
+    for ref in ['TAC_ref']:
+        new = pd.DataFrame(columns=['value'], index=All_res_multiindex.index)
+        step = 0.3
+        agr = np.arange(0 - step, 31, step, dtype=float)  # I use a bigger interval to not treat the limit case
+        for i in All_res_multiindex.index:
+            value = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2)
+            for ii in range(0, agr.size):
+                # print(ii) # select the right interval
+                if (value >= agr[ii] - step / 2) and (
+                        value < agr[ii] + step / 2):  # since it is filterd it goes up and only one condition is enough
+                    new['value'][i] = round(agr[ii], 2)
+                    break
+        All_res_multiindex[ref + '_Serie'] = new
+        All_res_multiindex.set_index(All_res_multiindex[ref + '_Serie'], drop=True, append=True, inplace=True)
+        All_res_multiindex.drop(ref + '_Serie', axis=1, inplace=True)
+    return All_res_multiindex
+
+
+def INTER_analysis(All_res_multiindex,All_res_INTRAserie, dict_param_relation):
+    All_res_ALLserie = deepcopy(All_res_multiindex)
+    All_res_ALLserie_dict = {}
+    All_res_ALLserie_dict_raw = {}
+    All_res_INTERserie_dict = {}
+    All_res_INTERserie_dict_raw = {}
+
+    for i in All_res_ALLserie.xs('Res_ref', axis=1).columns:
+        ref = i.replace('_ref', '')
+        Res_ref = deepcopy(All_res_ALLserie)
+        Res_ref = erase_unusefull_info(Res_ref, ref)  # erase not used info in specific pd ref
+        for ii in Res_ref.index.names:
+            if ii not in ['Serie', 'Repetition', i + '_Serie']:
+                Res_ref.reset_index(level=ii, drop=True, inplace=True)
+        Res_ref = Res_ref.swaplevel(i=-3, j=-1)
+        Res_ref = Res_ref.swaplevel(i=-2, j=-1)
+
+        All_res_ALLserie_dict_raw[ref] = deepcopy(All_res_ALLserie)
+        # All_res_ALLserie_dict_raw[ref] = erase_unusefull_info(All_res_ALLserie_dict_raw[ref], ref)
+        All_res_ALLserie_dict_raw[ref].sort_index(level=-1, ascending=True, inplace=True, na_position='last')
+
+        All_res_ALLserie_dict[ref] = pd.DataFrame()
+        All_res_ALLserie_dict[ref] = compute_stat(Res_ref)
+        All_res_ALLserie_dict[ref] = compute_profile_exactitude_global(dict_param_relation,
+                                                                       data_global=All_res_multiindex,
+                                                                       data_intra=All_res_INTRAserie,
+                                                                       data_all=All_res_ALLserie_dict[ref], ref=ref,
+                                                                       eq_des=None, serie='no')
+        All_res_ALLserie_dict[ref].sort_index(level=-1, ascending=True, inplace=True, na_position='last')
+
+        All_res_INTERserie_dict[ref] = compute_profile_exactitude_global(dict_param_relation,
+                                                                         data_global=All_res_multiindex,
+                                                                         data_intra=All_res_INTRAserie,
+                                                                         data_all=All_res_ALLserie_dict[ref], ref=ref,
+                                                                         eq_des=None, serie='yes')
+
+    return All_res_ALLserie_dict, All_res_ALLserie_dict_raw, All_res_INTERserie_dict, All_res_INTERserie_dict_raw
+def linear_regression(x=None, y=None):
     """
     Returns all the coeff of the linear regression.
     """
+    X = deepcopy(x)
+    Y = deepcopy(y)
     if (len(X) >1) and (len(Y) >1):
         # erase nan
         X_nan = X[X.isna()].index.tolist()
@@ -257,7 +413,7 @@ def compute_profile_exactitude_simplified(data_old, param):
 
     return data
 
-def compute_profile_exactitude_global(data_global = None, data_intra = None, data_all = None, ref = None, eq_des = None, serie='yes'):
+def compute_profile_exactitude_global(dict_param_relation, data_global = None, data_intra = None, data_all = None, ref = None, eq_des = None, serie='yes'):
     """ source: 2010_Cahier_des_techniques dans WP05"""
     logging.info('ref= ' + ref)
     data_global_new = deepcopy(data_global)
@@ -266,11 +422,12 @@ def compute_profile_exactitude_global(data_global = None, data_intra = None, dat
 
     data_inter_new = deepcopy(data_all)
 
-    dict_param_relation = {'VFA':['VFA_geq','pls_VFA_geq','FOS_geq','corr_FOS_geq','corr_Hach_FOS_geq'], # ref : [all param with this ref]
-                           'TAN':['TAN_geq','pls_TAN_geq'],
-                           'TAC':['TAC_geq','IC_geq'],
-                           'FOS':['FOS_geq'],
-                           }
+    # dict_param_relation = {'VFA':['VFA_geq','pls_VFA_geq','FOS_geq','corr_FOS_geq','corr_Hach_FOS_geq'], # ref : [all param with this ref]
+    #                        'TAN':['TAN_geq','pls_TAN_geq'],
+    #                        'TAC':['TAC_geq','IC_geq'],
+    #                        'FOS':['FOS_geq'],
+    #                        }
+
     profil_param = ['eq_des','J','I','SCEr','SCEb','SCE_FI','N','n2','N_','var_r','var_b', 'var_FI', 'R','std_kr','std_kb', 'std_FI', 'std_IT', 'degree', 'k_tol', 'Rf', 'Itol_up_rel',
                     'Itol_down_rel', 'biais_abs', 'biais_rel', 'Uc','k', 'U', 'U_rel','error_real']
     # erase ancient profil param pd if any
@@ -437,7 +594,7 @@ def compute_profile_exactitude_global(data_global = None, data_intra = None, dat
             except:
                 for ii in profil_param:
                     data_inter_new['SNAC_res_' + ii, param][i] = np.nan
-                logging.info('Something in accuracy profile for '+str(param)+' level '+str(i)+' went wrong')
+                logging.error('Something in accuracy profile for '+str(param)+', level "'+str(i)+'" went wrong')
 
     return data_inter_new
 
@@ -559,6 +716,103 @@ def initialize_param():
 #             All_res_twoindex.drop(ref + '_Serie', axis=1, inplace=True)
 #     return
 
+def metainfo(All_res_INTERserie_dict):
+    # metainfo
+
+    # I put in a table the information of inter data to put  in the livrable.
+    All_res_INTERserie_dict_metainfo = deepcopy(All_res_INTERserie_dict)
+    ref_imp = {'VFA': ['pls_VFA_geq'], 'TAN': ['TAN_geq'], 'TAC': ['TAC_geq']}
+    parameter_imp = {'Ref_res_mean': 1, 'SNAC_res_std': 3, 'SNAC_res_mean': 1, 'SNAC_res_k': 1, 'SNAC_res_U': 1,
+                     'SNAC_res_U_rel': 0, 'SNAC_res_error_real': 0}  # :'param' :  number --> decimel to round value
+    #:format(count_pH_acid/count, ".0%" All_res_INTERserie_dict_metainfo[ref][param].style.format("{:.0%}")
+    for ref in All_res_INTERserie_dict:
+        if ref in ref_imp:
+            for param in All_res_INTERserie_dict[ref].columns.levels[0].values:
+                if param not in parameter_imp:
+                    del All_res_INTERserie_dict_metainfo[ref][param]
+                else:  # todo : it does not work for now
+                    All_res_INTERserie_dict_metainfo[ref][param] = round_value_pd(
+                        All_res_INTERserie_dict_metainfo[ref][param], decimals=parameter_imp[param])
+                    for estimator in All_res_INTERserie_dict_metainfo[ref][param]:
+                        if estimator not in ref_imp[ref]:
+                            del All_res_INTERserie_dict_metainfo[ref][param][estimator]
+        else:
+            del All_res_INTERserie_dict_metainfo[ref]
+
+    parameter_imp = {'SNAC_res_std_aggr': 1, 'SNAC_res_std_aggr_rel': 1}
+    agrr = [[0, 2], [2, 10], [10, 30]]
+    # b=deepcopy(All_res_INTERserie_dict_metainfo)
+    c = All_res_INTERserie_dict_metainfo
+    for estimator in ['IC_geq', 'TAC_geq']:
+        new = pd.DataFrame(columns=['SNAC_res_std_aggr'], index=c['TAC'].index)
+        new_rel = pd.DataFrame(columns=['SNAC_res_std_aggr_rel'], index=c['TAC'].index)
+        for i in new.index:
+            # print(i)
+            if not np.isnan(i):
+                for ii in agrr:  # select the right interval
+                    if (i >= ii[0]) and (i < ii[1]):
+                        sel = ii
+                        break
+                selected_data = c['TAC'].loc[(c['TAC']['SNAC_res_std'][estimator].index > sel[0]) & (
+                            c['TAC']['SNAC_res_std'][estimator].index <= sel[1])]
+                observed_mean = selected_data['SNAC_res_mean'][estimator].mean()
+                new.loc[i]['SNAC_res_std_aggr'] = selected_data['SNAC_res_std'][
+                    estimator].median()  # obseved std median of selected data
+                new_rel.loc[i]['SNAC_res_std_aggr_rel'] = format(new.loc[i]['SNAC_res_std_aggr'] / observed_mean, ".1%")
+        c['TAC']['SNAC_res_std_aggr', estimator] = new
+        c['TAC']['SNAC_res_std_aggr_rel', estimator] = new_rel
+    return All_res_INTERserie_dict_metainfo
+def save_Excel(All_res_normal_metainfo,All_res_INTRAserie,All_res_normal_raw,All_res_ALLserie_dict,
+               All_res_INTERserie_dict, All_res_INTERserie_dict_metainfo, All_res_INTERserie_dict_raw,
+               raw_output_folder_path,file_SNAC):
+    # SAVING IN EXCEL
+    # put something else in the metainfo
+    All_res_normal_metainfo['All']['Total conditions'] = All_res_INTRAserie.shape[
+        0]  # we need to keep all the analysis in the data reference
+    # I need to trier with for loop since I cannot do it with index
+    for i in ['T1', 'T2', 'T3', 'T4']:
+        All_res_normal_metainfo[i]['Total conditions'] = All_res_INTRAserie.loc[i, :].shape[0]
+        logging.info('creating meta info from All_res_normal. not valid for other files input')
+
+        # Saving results table
+    All_res_normal = truncate_value_pd(All_res_INTRAserie, decimals=3)
+    All_res_normal_raw = truncate_value_pd(All_res_normal_raw, decimals=3)
+
+    # save all data with specific analysis
+    writer = pd.ExcelWriter(raw_output_folder_path + file_SNAC.replace('.csv', '') + ' intra_results.xlsx')
+    All_res_normal_raw.to_excel(writer, sheet_name='res_raw', startcol=1, startrow=1, freeze_panes=(3, 2))
+    All_res_normal.to_excel(writer, sheet_name='res_analysed', startcol=1, startrow=1, freeze_panes=(3, 2))
+    All_res_normal_metainfo.to_excel(writer, sheet_name='metainfo', startcol=1, startrow=1, freeze_panes=(2, 2))
+    writer.save()
+    writer.close()
+
+    # save all data with global analysis
+    writer = pd.ExcelWriter(raw_output_folder_path + file_SNAC.replace('.csv', '') + ' all_results.xlsx')
+    for i in All_res_ALLserie_dict:
+        round_value_pd(All_res_ALLserie_dict[i], decimals=2).to_excel(writer, sheet_name=str(i), startcol=1, startrow=1,
+                                                                      freeze_panes=(3, 2))
+    writer.save()
+    writer.close()
+
+    # save all data with inter serie analysis (complete analysis)
+    writer = pd.ExcelWriter(raw_output_folder_path + file_SNAC.replace('.csv', '') + ' raw_inter_results.xlsx')
+    for i in All_res_INTERserie_dict:
+        round_value_pd(All_res_INTERserie_dict[i], decimals=2).to_excel(writer, sheet_name=str(i), startcol=1,
+                                                                        startrow=1, freeze_panes=(3, 3))
+
+    for i in All_res_INTERserie_dict_metainfo:
+        All_res_INTERserie_dict_metainfo[i].to_excel(writer, sheet_name=i + ' metainfo', startcol=1, startrow=1,
+                                                     freeze_panes=(3, 3))
+
+    for i in All_res_INTERserie_dict_raw:
+        round_value_pd(All_res_INTERserie_dict_raw[i], decimals=2).to_excel(writer, sheet_name=str(i), startcol=1,
+                                                                            startrow=1, freeze_panes=(3, 3))
+
+    writer.save()
+    writer.close()
+
+    logging.info('Files saved correctly')
+    return
 
 
 

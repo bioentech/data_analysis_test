@@ -59,7 +59,7 @@ value_lim1= 0.2
 value_lim2= 0.25
 value_lim3= 0.30
 
-def plot_Benchmark_param(data_dict, path, Res_SNAC_raw, Res_SNAC_twoindex ):
+def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None):
 
     dict_param_relation = {'VFA':'VFA',# param: ref ; this is important to create graphs from good data dictionary
                            'FOS':'VFA',
@@ -76,17 +76,17 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw, Res_SNAC_twoindex ):
                            }
 
     param_to_plot = {
-    'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform'},
-    'TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'uniform'},
-    'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
-    'pls_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform'},
-    'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
-    'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
-    'sep_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform'},
-    'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform'},
-    'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'FOS ref'},
-    # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'VFA ref'},
-    'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform'}
+    'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression},
+    'TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'uniform', 'lr': linear_regression},
+    'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform', 'lr': linear_regression},
+    'pls_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform', 'lr': linear_regression},
+    'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform','lr': linear_regression},
+    'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform','lr': linear_regression},
+    'sep_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform','lr': linear_regression},
+    'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform','lr': linear_regression},
+    'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'FOS ref','lr': linear_regression},
+    # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'VFA ref','lr': linear_regression},
+    'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform','lr': linear_regression}
                     }
     # all graphs
     for param in param_to_plot:
@@ -114,8 +114,8 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw, Res_SNAC_twoindex ):
         'pls_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color,'test_color': 'uniform'},
         'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
         'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
-        'corr_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': FOS_color,'test_color': 'uniform', 'linear_correction': [1.33,1.01]},
-        'corr_Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': FOS_color, 'test_color': 'uniform', 'linear_correction': [0.81, 1.16]},
+        # 'corr_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': FOS_color,'test_color': 'uniform', 'linear_correction': [1.33,1.01]},
+        # 'corr_Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': FOS_color, 'test_color': 'uniform', 'linear_correction': [0.81, 1.16]},
         'sep_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color,'test_color': 'uniform'},
                      }
     for param in param_to_plot:
@@ -145,10 +145,10 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw, Res_SNAC_twoindex ):
         #         'test_color': 'uniform', 'titre_supp': '_(VFA ref)'},
         'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,
                 'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'linear_regression': 'yes'},
-        'corr_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_FOS_geq', 'color': FOS_color,
-                'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'linear_correction': [1.33,1.01]},
-        'corr_Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_Hach_FOS_geq', 'color': FOS_color,
-                'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_correction': [0.81, 1.16]}
+        # 'corr_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_FOS_geq', 'color': FOS_color,
+        #         'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'linear_correction': [1.33,1.01]},
+        # 'corr_Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_Hach_FOS_geq', 'color': FOS_color,
+        #         'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_correction': [0.81, 1.16]}
     }
     for param in param_to_plot:
         standard_plot_new(data_dict[dict_param_relation[param]], param_to_plot, param, path, 'All_conc_')
@@ -158,8 +158,10 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw, Res_SNAC_twoindex ):
     param_to_plot = {
         #'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
          #       'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)'},
+         # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
+         #         'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_regression': 'yes'},
          'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
-                 'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_regression': 'yes'},
+                 'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'lr': linear_regression},
     }
     for param in param_to_plot:
         FOS_Hach_plot(data_dict[dict_param_relation[param]], param_to_plot, param, path, 'All_conc_')
@@ -170,10 +172,10 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw, Res_SNAC_twoindex ):
         #         'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'xy_lim':[2,2]},
         'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,
                 'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'linear_regression': 'yes', 'xy_lim':[2,2]},
-        'corr_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_FOS_geq', 'color': FOS_color,
-                'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'linear_correction': [1.33,1.01], 'xy_lim':[1.2,1.2]},
-        'corr_Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_Hach_FOS_geq','color': FOS_color,
-                          'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_correction': [0.81, 1.16]}
+        # 'corr_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_FOS_geq', 'color': FOS_color,
+        #         'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'linear_correction': [1.33,1.01], 'xy_lim':[1.2,1.2]},
+        # 'corr_Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_Hach_FOS_geq','color': FOS_color,
+        #                   'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_correction': [0.81, 1.16]}
     }
 
     for param in param_to_plot:
@@ -184,8 +186,10 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw, Res_SNAC_twoindex ):
     param_to_plot = {
         # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
         #         'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'xy_lim':[2,2]},
+        # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
+        #         'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_regression': 'yes', 'xy_lim':[2,2]},
         'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
-                'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_regression': 'yes', 'xy_lim':[2,2]},
+                'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'lr': linear_regression, 'xy_lim': [2, 2]},
                     }
     for param in param_to_plot:
         data_selection = data_dict[dict_param_relation[param]].copy(deep=True)
@@ -193,7 +197,7 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw, Res_SNAC_twoindex ):
         FOS_Hach_plot(data_selection, param_to_plot, param, path, 'All_conc_zoom_')
 
 
-def plot_Benchmark(data, path, Res_SNAC_raw, Res_SNAC_twoindex ):
+def plot_Benchmark(data, path, Res_SNAC_raw):
 
     param_to_plot = {
                      'VFA':{'unit':'gAc_eq L'+get_super('-1'), 'color':VFA_color, 'test_color':'different'},
@@ -554,7 +558,7 @@ def standard_plot_new(data,dict_param,param,path,save_name):
 
                     # plot the regression model
                     if 'linear_regression' in dict_param[param]:
-                        reg, R2, coef, intercept = linear_regression(X=ref_matrix, Y=mean_matrix)
+                        reg, R2, coef, intercept = linear_regression(x=ref_matrix, y=mean_matrix)
                         X_regr = np.linspace(min(ref_matrix)*0.9, max(ref_matrix)*1.1, num=50)
                         X_regr = X_regr.reshape(X_regr.size, 1)
                         ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
@@ -564,6 +568,38 @@ def standard_plot_new(data,dict_param,param,path,save_name):
                         ax.text(0.98, 0.02,
                                 'lin. regr:\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, coef[0][0], intercept[0]), ha='right',
                                 va='bottom', transform=ax.transAxes, fontsize = fontsize_legend)
+
+                    if 'lr' in dict_param[param]:
+                        if dict_param[param]['lr'] == None:
+                            print('no linear regression active')
+                        elif dict_param[param]['lr'] == 'yes':
+                            print('linear regression active')
+                        elif dict_param[param]['lr'] == 'check':
+                            reg, R2, a, b = linear_regression(x=ref_matrix, y=mean_matrix)
+                            X_regr = np.linspace(min(ref_matrix) * 0.9, max(ref_matrix) * 1.1, num=50)
+                            X_regr = X_regr.reshape(X_regr.size, 1)
+                            ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
+                                    label='y=' + str(np.around(a, decimals=2)) + 'x + ' + str(
+                                        np.around(b, decimals=2)) + ', R2=' + str(np.around(R2, decimals=2))
+                                    )
+                            print('linear regression active')
+                        else: #we have a dictionary
+                            index = param_ref + '-' + Y
+                            a = dict_param['lr'].loc[index, 'a']
+                            b = dict_param['lr'].loc[index, 'b']
+                            R2 = dict_param['lr'].loc[index, 'R2']
+
+                            X_regr = np.linspace(min(ref_matrix)*0.9, max(ref_matrix)*1.1, num=50)
+                            X_regr = X_regr.reshape(X_regr.size, 1)
+                            ax.plot(X_regr, a*X_regr+b, mark4, color=lin_regr_color, lw=2,
+                                    label='y=' + str(np.around(a, decimals=2)) + 'x + ' + str(
+                                        np.around(b, decimals=2)) + ', R2=' + str(np.around(R2, decimals=2))
+                                    )
+                        ax.text(0.98, 0.02,
+                                'lin. regr:\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, a, b), ha='right',
+                                va='bottom', transform=ax.transAxes, fontsize = fontsize_legend)
+
+
                     if 'libelled' in dict_param[param]:
                         for xx in dict_param[param]['libelled'].index:
                             x = ref[xx]
@@ -596,7 +632,7 @@ def standard_plot_new(data,dict_param,param,path,save_name):
 
                 # plot the regression model
                 if 'linear_regression' in dict_param[param]:
-                    reg, R2, coef, intercept = linear_regression(X=ref, Y=mean)
+                    reg, R2, coef, intercept = linear_regression(x=ref, y=mean)
                     X_regr = np.linspace(min(ref)*0.9, max(ref)*1.1, num=50)
                     X_regr = X_regr.reshape(X_regr.size, 1)
                     ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
@@ -605,7 +641,33 @@ def standard_plot_new(data,dict_param,param,path,save_name):
                             'lin. regr:\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2,coef[0][0],intercept[0]),
                             ha='right', va='bottom', transform=ax.transAxes, fontsize = fontsize_legend)
 
-
+                if 'lr' in dict_param[param]:
+                    if not isinstance(dict_param[param]['lr'], pd.DataFrame):
+                        if dict_param[param]['lr'] == None:
+                            logging.info('no linear regression active for ' + param)
+                        elif dict_param[param]['lr'] == 'yes':
+                            reg, R2, a, b = linear_regression(x=ref, y=mean)
+                            X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
+                            X_regr = X_regr.reshape(X_regr.size, 1)
+                            ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
+                                    label='lin. regr')
+                            ax.text(0.98, 0.02, 'lin. regr:\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, a, b), ha='right',
+                                    va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
+                            logging.info('linear regression active ' + param)
+                    else:  # we have a dictionary
+                        index = X.replace('_ref', '') + '-' + Y
+                        if index in dict_param[param]['lr'].index:
+                            a = dict_param[param]['lr'].loc[index, 'a']
+                            b = dict_param[param]['lr'].loc[index, 'b']
+                            R2 = dict_param[param]['lr'].loc[index, 'R2']
+                            X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
+                            X_regr = X_regr.reshape(X_regr.size, 1)
+                            ax.plot(X_regr, a * X_regr + b, mark4, color=lin_regr_color, lw=2,
+                                    label='lin. regr')
+                            ax.text(0.98, 0.02, 'lin. regr:\n$R^{2}$='+R2+'\ny=%.2fx + %.2f' % (a, b), ha='right',
+                                    va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
+                        else:
+                            logging.info('No corrective factors for ' + index)
 
                 if 'libelled' in dict_param[param]:
                     for xx in dict_param[param]['libelled'].index:
@@ -796,7 +858,7 @@ def FOS_Hach_plot(data,dict_param,param,path,save_name):
                 ax.errorbar(ref, mean, xerr=ref_std, fmt=",", color='dimgrey',label='std', markersize=8, capsize=3, elinewidth=1)
 
         if 'linear_regression' in dict_param[param]:
-            reg, R2, coef, intercept = linear_regression(X=ref, Y=mean)
+            reg, R2, coef, intercept = linear_regression(x=ref, y=mean)
             X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
             X_regr = X_regr.reshape(X_regr.size, 1)
             ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
@@ -805,6 +867,33 @@ def FOS_Hach_plot(data,dict_param,param,path,save_name):
                     'lin. regr:\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, coef[0][0], intercept[0]), ha='right', va='bottom',
                     transform=ax.transAxes, fontsize = fontsize_legend)
 
+        if 'lr' in dict_param[param]:
+            if not isinstance(dict_param[param]['lr'], pd.DataFrame):
+                if dict_param[param]['lr'] == None:
+                    logging.info('no linear regression active for ' + param)
+                elif dict_param[param]['lr'] == 'yes':
+                    reg, R2, a, b = linear_regression(x=ref, y=mean)
+                    X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
+                    X_regr = X_regr.reshape(X_regr.size, 1)
+                    ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
+                            label='lin. regr')
+                    ax.text(0.98, 0.02, 'lin. regr:\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, a, b), ha='right',
+                            va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
+                    logging.info('linear regression active ' + param)
+            else:  # we have a dictionary
+                index = X.replace('_ref', '') + '-' + Y
+                if index in dict_param[param]['lr'].index:
+                    a = dict_param[param]['lr'].loc[index, 'a']
+                    b = dict_param[param]['lr'].loc[index, 'b']
+                    R2 = dict_param[param]['lr'].loc[index, 'R2']
+                    X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
+                    X_regr = X_regr.reshape(X_regr.size, 1)
+                    ax.plot(X_regr, a * X_regr + b, mark4, color=lin_regr_color, lw=2,
+                            label='lin. regr')
+                    ax.text(0.98, 0.02, 'lin. regr:\n$R^{2}$=' + R2 + '\ny=%.2fx + %.2f' % (a, b), ha='right',
+                            va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
+                else:
+                    logging.info('No corrective factors for ' + index)
 
         ax.set_title(title, fontsize=fontsize, fontname=fontname)
         ax.set_ylim(ymin=-0.05)
