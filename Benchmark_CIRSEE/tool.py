@@ -94,6 +94,7 @@ def multiindex_analysis_simple(All_res_twoindex,value_round):
             All_res_multiindex.set_index(All_res_multiindex[iii + '_Serie'], drop=True, append=True, inplace=True)
             All_res_multiindex.drop(iii + '_Serie', axis=1, inplace=True)
     return All_res_multiindex
+
 def multiindex_analysis_specific(All_res_multiindex, All_res_INTRAserie, value_round):
     # changing the index for FOS and TAC : FOS since they do not really have a reference I must use the mean of each condition
     for ref in ['FOS_ref']:
@@ -105,10 +106,10 @@ def multiindex_analysis_specific(All_res_multiindex, All_res_INTRAserie, value_r
         All_res_multiindex.set_index(All_res_multiindex[ref + '_Serie'], drop=True, append=True, inplace=True)
         All_res_multiindex.drop(ref + '_Serie', axis=1, inplace=True)
 
-    # Agregate more TAC ref for AP analysis
+    # Agregate more TAC ref for AP analysis. I agregate TAC using a reage (step)
     for ref in ['TAC_ref']:
         new = pd.DataFrame(columns=['value'], index=All_res_multiindex.index)
-        step = 0.3
+        step = 0.3 # g CaCO3/L
         agr = np.arange(0 - step, 31, step, dtype=float)  # I use a bigger interval to not treat the limit case
         for i in All_res_multiindex.index:
             value = round(All_res_INTRAserie['Ref_res_mean', ref].xs(i[0], level='Serie').values[0], 2)
@@ -795,7 +796,7 @@ def save_Excel(All_res_normal_metainfo,All_res_INTRAserie,All_res_normal_raw,All
     writer.close()
 
     # save all data with inter serie analysis (complete analysis)
-    writer = pd.ExcelWriter(raw_output_folder_path + file_SNAC.replace('.csv', '') + ' raw_inter_results.xlsx')
+    writer = pd.ExcelWriter(raw_output_folder_path + file_SNAC.replace('.csv', '') + ' inter_results.xlsx')
     for i in All_res_INTERserie_dict:
         round_value_pd(All_res_INTERserie_dict[i], decimals=2).to_excel(writer, sheet_name=str(i), startcol=1,
                                                                         startrow=1, freeze_panes=(3, 3))

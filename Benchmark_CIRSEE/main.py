@@ -68,28 +68,45 @@ All_res_normal_raw = pd.concat([Res_ref, Res_SNAC], axis=1, keys=['reference dat
 
 # cleaning data
 logging.info('############### DATA CLEANING ##############')
-drop_analysis = {'T3_2_1',# salt did not dissolved properly
-                 'T3_2_2',# salt did not dissolved properly
-                 'T3_2_3',# salt did not dissolved properly
-                 'T3_7_1',# salt did not dissolved properly
-                 'T3_7_2',# salt did not dissolved properly
-                 'T3_7_3',# salt did not dissolved properly
-                 'T3_8_1',# because we changed concentration of T3_8 afterwards
-                 'T3_8_2',# because we changed concentration of T3_8 afterwards
-                 'T3_8_3',# salt did not dissolved properly
-                 'T3_8_4',# salt did not dissolved properly
-                 'T3_8_5',# no results because volume too important
-                 'T3_8_6',  # salt did not dissolved properly
-                 'T3_8_7',  # salt did not dissolved properly
-                 'T4_5_1',  # pas de fichier src
-                 'T4_5_2',  # pas de fichier src
-                 'T4_5_3'}  # les autres n'étant pas arrivé au serveur, je ne le considère pas
+drop_analysis = {'T3_2_1':['all'],# salt did not dissolved properly
+                 'T3_2_2':['all'],# salt did not dissolved properly
+                 'T3_2_3':['all'],# salt did not dissolved properly
+                 'T3_7_1':['all'],# salt did not dissolved properly
+                 'T3_7_2':['all'],# salt did not dissolved properly
+                 'T3_7_3':['all'],# salt did not dissolved properly
+                 'T3_8_1':['all'],# because we changed concentration of T3_8 afterwards
+                 'T3_8_2':['all'],# because we changed concentration of T3_8 afterwards
+                 'T3_8_3':['all'],# salt did not dissolved properly
+                 'T3_8_4':['all'],# salt did not dissolved properly
+                 'T3_8_5':['all'],# no results because volume too important
+                 'T3_8_6':['all'],  # salt did not dissolved properly
+                 'T3_8_7':['all'],  # salt did not dissolved properly
+                 # 'T3_8_8':['IC_geq'],  # error on IC je l'enleve car cela ne change rien au resultats
+                 'T4_5_1':['all'],  # pas de fichier src
+                 'T4_5_2':['all'],  # pas de fichier src
+                 'T4_5_3':['all']
+                    }  # les autres n'étant pas arrivé au serveur, je ne le considère pas
 for res in ['Res_SNAC', 'Res_ref']: # we erase only in SNAC res because if not it could erase the _1 where the reference values are saved
     for test in drop_analysis:
         data = globals()[res]
         if test in data.index:
-            data.drop(test, inplace=True)
-            logging.info(test + ' erased from ' + res)
+            if 'all' in drop_analysis[test]:
+                data.drop(test, inplace=True)
+                logging.info(test + ' erased from ' + res)
+            else:
+                for estimator in drop_analysis[test]:
+                    if estimator in data.columns: #if not it adds column when not find the parameter
+                        data.loc[test,estimator] = np.nan
+                        logging.info(estimator + ' erased from ' +test+' in ' + res)
+
+# une pls only on accepted signal data
+logging.info('pls estimators work only on accepted signal')
+data = globals()['Res_SNAC']
+for test in data.index:
+    if data.loc[test,'102_0'] == False:
+        data.loc[test, 'pls_VFA_geq'] = np.nan
+        data.loc[test, 'pls_TAN_geq'] = np.nan
+        logging.info('pls estimators erased on '+ test)
 
 
 # check if res have the same elements
@@ -195,13 +212,7 @@ All_res_twoindex = pd.concat([Res_ref_twoindex,Res_SNAC_twoindex],
 
 All_res_twoindex.index.set_names(["Serie", "Repetition"], level=[0,1], inplace=True)
 
-# add corrected FOS
-# All_res_twoindex['Res_SNAC','corr_FOS_geq'] = (All_res_twoindex['Res_SNAC']['FOS_geq'] - 1.01)/1.33 # 1.01 et 1.33 sont issus de la regression linéaire
-# All_res_twoindex['Res_SNAC']['corr_FOS_geq'][All_res_twoindex['Res_SNAC']['corr_FOS_geq']<0] = 0 # si c'est negatif après correction il faut mettre zzro car pas de sens sinon
-#
-# All_res_twoindex['Res_SNAC','corr_Hach_FOS_geq'] = (All_res_twoindex['Res_ref']['FOS_ref'] - 1.16)/0.81 # 1.01 et 1.33 sont issus de la regression linéaire
-# All_res_twoindex['Res_SNAC']['corr_Hach_FOS_geq'][All_res_twoindex['Res_SNAC']['corr_Hach_FOS_geq']<0] = 0 # si c'est negatif après correction il faut mettre zzro car pas de sens sinon
-
+All_res_twoindex['Res_SNAC','Hach_FOS_geq'] = All_res_twoindex['Res_ref']['FOS_ref'] # I add hach fos in order to be used as an estimator also
 
 #create multindex
 All_res_multiindex = multiindex_analysis_simple(All_res_twoindex,value_round)
@@ -220,39 +231,85 @@ All_res_multiindex = multiindex_analysis_specific(All_res_multiindex,All_res_INT
 
 
 # creating dataframe with data INTER serie
-dict_param_relation = {'VFA': ['VFA_geq', 'pls_VFA_geq', 'FOS_geq','sep_VFA1_geq','sep_VFA2_geq'],  # ref : [all param with this ref]
+dict_param_relation = {'VFA': ['VFA_geq', 'pls_VFA_geq', 'FOS_geq', 'Hach_FOS_geq','sep_VFA1_geq','sep_VFA2_geq'],  # ref : [all param with this ref]
                        'TAN': ['TAN_geq', 'pls_TAN_geq','sep_TAN_geq'],
                        'TAC': ['TAC_geq', 'IC_geq'],
-                       'FOS': ['FOS_geq'],
+                       # 'FOS': ['FOS_geq'],
                        }
 All_res_ALLserie_dict, All_res_ALLserie_dict_raw, All_res_INTERserie_dict, All_res_INTERserie_dict_raw = INTER_analysis(All_res_multiindex,All_res_INTRAserie, dict_param_relation)
 
 # metainfo
 All_res_INTERserie_dict_metainfo = metainfo(All_res_INTERserie_dict)
 
+
+
 #### repeat all code for corrected values #################
 # correction estimators with linear regression
-dict_param_relation_Corr = {}
-corr_factor = pd.DataFrame(columns=['Param','Estimator','a','b','R2'])
+lim_corr = {
+           'VFA': {'VFA_geq':[0.45,3], 'pls_VFA_geq':[0.0,3], 'FOS_geq':[0,10], 'Hach_FOS_geq':[0,10],'sep_VFA1_geq':[0.45,3],'sep_VFA2_geq':[0.45,3]},  # ref : [all param with this ref]
+           'TAN': {'TAN_geq': [0,5], 'pls_TAN_geq': [0,5],'sep_TAN_geq': [0,5]},
+           'TAC': {'TAC_geq':[0,31], 'IC_geq':[0,31]},
+           # 'FOS': {'FOS_geq': [0,10]},
+            }
+
+dict_param_relation_Corr_raw = {}
+corr_factor_raw = pd.DataFrame(columns=['Param','Estimator','a','b','R2','Corr.range', 'Applied'])
+for param in dict_param_relation:
+    ref = param + '_ref'
+    dict_param_relation_Corr_raw[param] = []
+    for estimator in dict_param_relation[param]:
+        if (ref in All_res_twoindex['Res_ref'].columns) and (estimator in All_res_twoindex['Res_SNAC'].columns):
+            min = lim_corr[param][estimator][0]
+            max = lim_corr[param][estimator][1]
+            selected_data = All_res_twoindex[(All_res_twoindex['Res_ref',ref]>=min) & (All_res_twoindex['Res_ref',ref]<=max)]
+            X = selected_data['Res_ref',ref]
+            Y = selected_data['Res_SNAC',estimator]
+            reg, R2, coef, intercept = linear_regression(x=X, y=Y)
+            index = param+'-'+estimator
+            corr_factor_raw.loc[index,'Param'] = param
+            corr_factor_raw.loc[index,'Estimator'] = estimator
+            corr_factor_raw.loc[index,'a'] = round(coef[0][0],2)
+            corr_factor_raw.loc[index,'b'] = round(intercept[0], 2)
+            corr_factor_raw.loc[index,'R2'] = format(R2, ".0%")
+            corr_factor_raw.loc[index, 'Corr.range'] = lim_corr[param][estimator]
+            dict_param_relation_Corr_raw[param].append('corr_'+estimator)
+        else:
+            logging.info(ref+' or '+estimator+' % not in All_res_twoindex')
+
+dict_param_relation_Corr = dict_param_relation_Corr_raw
+corr_factor = corr_factor_raw
+logging.info('We use "raw" data for corrective factors')
+
+# correction estimators with linear regression
+dict_param_relation_Corr_INTER = {}
+corr_factor_INTER = pd.DataFrame(columns=['Param','Estimator','a','b','R2','Corr.range','Applied'])
 for param in dict_param_relation:
     if param in All_res_INTERserie_dict:
-        dict_param_relation_Corr[param]=[]
+        dict_param_relation_Corr_INTER[param]=[]
         ref = param+'_ref'
-        X = All_res_INTERserie_dict[param]['Ref_res_mean',ref]
         for estimator in dict_param_relation[param]:
             if estimator in All_res_INTERserie_dict[param]['SNAC_res_mean'].columns:
-                Y = All_res_INTERserie_dict[param]['SNAC_res_mean',estimator]
+                min = lim_corr[param][estimator][0]
+                max = lim_corr[param][estimator][1]
+                selected_data = All_res_INTERserie_dict[param][(All_res_INTERserie_dict[param]['Ref_res_mean',ref] >= min) & (All_res_INTERserie_dict[param]['Ref_res_mean',ref] <= max)]
+                X = selected_data['Ref_res_mean',ref]
+                Y = selected_data['SNAC_res_mean',estimator]
                 reg, R2, coef, intercept = linear_regression(x=X, y=Y)
                 index = param+'-'+estimator
-                corr_factor.loc[index,'Param'] = param
-                corr_factor.loc[index,'Estimator'] = estimator
-                corr_factor.loc[index,'a'] = round(coef[0][0],2)
-                corr_factor.loc[index,'b'] = round(intercept[0], 2)
-                corr_factor.loc[index,'R2'] = format(R2, ".0%")
-                dict_param_relation_Corr[param].append('corr_'+estimator)
+                corr_factor_INTER.loc[index,'Param'] = param
+                corr_factor_INTER.loc[index,'Estimator'] = estimator
+                corr_factor_INTER.loc[index,'a'] = round(coef[0][0],2)
+                corr_factor_INTER.loc[index,'b'] = round(intercept[0], 2)
+                corr_factor_INTER.loc[index,'R2'] = format(R2, ".0%")
+                corr_factor_raw.loc[index, 'Corr.range'] = lim_corr[param][estimator]
+                dict_param_relation_Corr_INTER[param].append('corr_'+estimator)
+
+# dict_param_relation_Corr = dict_param_relation_Corr_INTER
+# corr_factor = corr_factor_INTER
+#logging.info('We use INTER data for corrective factors')
 #
 # correction estimators with linear regression
-All_res_twoindex_Corr=deepcopy(All_res_twoindex) # it is a multilevel dataframe
+All_res_twoindex_Corr = deepcopy(All_res_twoindex) # it is a multilevel dataframe
 for param in dict_param_relation:
     for estimator in dict_param_relation[param]:
         if estimator in All_res_twoindex_Corr['Res_SNAC']:
@@ -294,14 +351,12 @@ raw_inter_path = os.path.join(raw_output_folder_path, 'inter')
 raw_all_path = os.path.join(raw_output_folder_path, 'all')
 for i in ['intra','inter','all']:
     os.makedirs(os.path.join(raw_output_folder_path, i,'image'))
-    os.makedirs(os.path.join(raw_output_folder_path,i,'image_pls'))
 
 corr_intra_path = os.path.join(corr_output_folder_path, 'intra')
 corr_inter_path = os.path.join(corr_output_folder_path, 'inter')
 corr_all_path = os.path.join(corr_output_folder_path, 'all')
 for i in ['intra','inter','all']:
     os.makedirs(os.path.join(corr_output_folder_path,i,'image'))
-    os.makedirs(os.path.join(corr_output_folder_path,i,'image_pls'))
 
 
 # SAVING IN EXCEL
@@ -316,7 +371,8 @@ save_Excel(All_res_normal_metainfo, All_res_INTRAserie_Corr,All_res_normal_raw, 
 
 # save corrective factor
 writer = pd.ExcelWriter(corr_output_folder_path + file_SNAC.replace('.csv', '') + ' corrective factors.xlsx')
-round_value_pd(corr_factor, decimals=2).to_excel(writer, startcol=1, startrow=1,freeze_panes=(3, 2))
+round_value_pd(corr_factor_raw, decimals=2).to_excel(writer, sheet_name='raw', startcol=1, startrow=1,freeze_panes=(2, 2))
+round_value_pd(corr_factor_INTER, decimals=2).to_excel(writer, sheet_name='INTER', startcol=1, startrow=1,freeze_panes=(2, 2))
 writer.save()
 writer.close()
 
@@ -326,12 +382,12 @@ logging.info('Saving data ended correctly')
 ##### PLOTTING ######
 
 # plot_Benchmark_param(All_res_ALLserie_dict, all_path, truncate_value_pd(Res_SNAC_raw,decimals=1), Res_SNAC_twoindex)
-# plot_Benchmark(All_res_INTRAserie, raw_intra_path, truncate_value_pd(Res_SNAC_raw,decimals=1))
-plot_Benchmark_param(All_res_INTERserie_dict, raw_inter_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression = corr_factor)
+plot_Benchmark(All_res_INTRAserie, raw_intra_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression =corr_factor) # 'None' or 'indip' ou 'corr_factor'
+plot_Benchmark_param(All_res_INTERserie_dict, raw_inter_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression =None ) # 'None' or 'indip' ou 'corr_factor'
 logging.info('Plotting raw data ended correctly')
 
-# plot_Benchmark(All_res_INTRAserie_Corr, corr_intra_path, truncate_value_pd(Res_SNAC_raw,decimals=1))
-plot_Benchmark_param(All_res_INTERserie_dict_Corr, corr_inter_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression = 'yes' )
+plot_Benchmark(All_res_INTRAserie_Corr, corr_intra_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression ='indip') # 'None' or 'indip' ou 'corr_factor'
+plot_Benchmark_param(All_res_INTERserie_dict_Corr, corr_inter_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression = None ) # 'None' or 'indip' ou 'corr_factor'
 logging.info('Plotting corrected data ended correctly')
 
 

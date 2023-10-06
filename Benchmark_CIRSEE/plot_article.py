@@ -65,6 +65,7 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None)
                            'FOS':'VFA',
                            'corr_FOS': 'VFA',
                            'corr_Hach_FOS': 'VFA',
+                           'Hach_FOS': 'VFA',
                            'pls_VFA':'VFA',
                            'sep_VFA1': 'VFA',
                            'sep_VFA2': 'VFA',
@@ -84,21 +85,30 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None)
     'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform','lr': linear_regression},
     'sep_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform','lr': linear_regression},
     'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform','lr': linear_regression},
-    'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'FOS ref','lr': linear_regression},
-    # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'VFA ref','lr': linear_regression},
+    # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'FOS ref','lr': linear_regression, 'titre_supp': ''},
+    'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'VFA ref','lr': linear_regression,},
+    'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'Hach_FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'VFA ref','lr': linear_regression,},
     'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform','lr': linear_regression}
                     }
     # all graphs
     for param in param_to_plot:
         standard_plot_new(data_dict[dict_param_relation[param]], param_to_plot, param, path, 'All_conc_')
+        box_plot_variance(data_dict[dict_param_relation[param]], param_to_plot, param, path, 'Variance_analysis_')
 
 
     ###### VFA zoom
     param_to_plot = {
-        'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform'},
-        'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform','xy_lim':[2,2]},
-        'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform'},
-        'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform'},
+        'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression,},
+        'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression,'xy_lim':[1,1]},
+        'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression,},
+        'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression,},
+        # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,
+        #         'test_color': 'uniform', 'titre_supp': '',  'lr': linear_regression, 'xy_lim': [2, 2]},
+        'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,
+                'test_color': 'uniform', 'titre_supp': '',  'lr': linear_regression, 'xy_lim': [2, 2]},
+        'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'Hach_FOS_geq', 'color': FOS_color,
+                'test_color': 'uniform', 'titre_supp': '', 'lr': linear_regression, 'xy_lim': [2, 2]},
+
                     }
     for param in param_to_plot:
         data_selection = data_dict[dict_param_relation[param]].copy(deep=True)
@@ -109,13 +119,14 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None)
     param_to_plot = {
         'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform'},
         'TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'uniform'},
-        'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform'},
+        'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'),'X': 'TAC_ref', 'Y': 'TAC_geq', 'color': TAC_color, 'test_color': 'uniform'},
+        'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'X': 'TAC_ref', 'Y': 'IC_geq', 'color': TAC_color, 'test_color': 'uniform'},
         'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
         'pls_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color,'test_color': 'uniform'},
         'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
         'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
-        # 'corr_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': FOS_color,'test_color': 'uniform', 'linear_correction': [1.33,1.01]},
-        # 'corr_Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': FOS_color, 'test_color': 'uniform', 'linear_correction': [0.81, 1.16]},
+        'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': FOS_color,'test_color': 'uniform'},
+        'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': FOS_color, 'test_color': 'uniform'},
         'sep_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color,'test_color': 'uniform'},
                      }
     for param in param_to_plot:
@@ -137,68 +148,20 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None)
         data_selection = data_selection[data_selection.loc[:, 'Ref_res_mean']['VFA_ref'] <= 1.0]
         plot_exactitude_general(data_selection, param_to_plot, param, path, 'All_conc_AP_zoom_')
 
-
-
-    ##### FOS analysis based on VFA ref
+    ###### IC zoom
     param_to_plot = {
-        # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,
-        #         'test_color': 'uniform', 'titre_supp': '_(VFA ref)'},
-        'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,
-                'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'linear_regression': 'yes'},
-        # 'corr_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_FOS_geq', 'color': FOS_color,
-        #         'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'linear_correction': [1.33,1.01]},
-        # 'corr_Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_Hach_FOS_geq', 'color': FOS_color,
-        #         'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_correction': [0.81, 1.16]}
-    }
-    for param in param_to_plot:
-        standard_plot_new(data_dict[dict_param_relation[param]], param_to_plot, param, path, 'All_conc_')
+        'IC': {'unit': 'gCaCO' + get_sub('3') + '_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform',
+               'lr': linear_regression}
 
-
-    ###### FOS analysis (Hach) based on VFA ref
-    param_to_plot = {
-        #'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
-         #       'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)'},
-         # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
-         #         'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_regression': 'yes'},
-         'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
-                 'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'lr': linear_regression},
-    }
-    for param in param_to_plot:
-        FOS_Hach_plot(data_dict[dict_param_relation[param]], param_to_plot, param, path, 'All_conc_')
-
-    # #### FOS zoom
-    param_to_plot = {
-        # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,
-        #         'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'xy_lim':[2,2]},
-        'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,
-                'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'linear_regression': 'yes', 'xy_lim':[2,2]},
-        # 'corr_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_FOS_geq', 'color': FOS_color,
-        #         'test_color': 'uniform', 'titre_supp': '_(VFA ref)', 'linear_correction': [1.33,1.01], 'xy_lim':[1.2,1.2]},
-        # 'corr_Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'corr_Hach_FOS_geq','color': FOS_color,
-        #                   'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_correction': [0.81, 1.16]}
-    }
-
-    for param in param_to_plot:
-        data_selection = data_dict[dict_param_relation[param]].copy(deep=True)
-        data_selection = data_selection[data_selection.loc[:, 'Ref_res_mean']['VFA_ref'] <= 1.0]
-        standard_plot_new(data_selection, param_to_plot, param, path, 'All_conc_zoom_')
-
-    param_to_plot = {
-        # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
-        #         'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'xy_lim':[2,2]},
-        # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
-        #         'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'linear_regression': 'yes', 'xy_lim':[2,2]},
-        'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': FOS_color,
-                'test_color': 'uniform', 'titre_supp': '_(Hach-VFA_ref)', 'lr': linear_regression, 'xy_lim': [2, 2]},
                     }
     for param in param_to_plot:
         data_selection = data_dict[dict_param_relation[param]].copy(deep=True)
-        data_selection = data_selection[data_selection.loc[:, 'Ref_res_mean']['VFA_ref'] <= 1.0]
-        FOS_Hach_plot(data_selection, param_to_plot, param, path, 'All_conc_zoom_')
+        data_selection = data_selection[data_selection.loc[:, 'Ref_res_mean']['TAC_ref'] <= 1.0]
+        standard_plot_new(data_selection, param_to_plot, param, path, 'All_conc_zoom_')
 
+def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
 
-def plot_Benchmark(data, path, Res_SNAC_raw):
-
+    ###### graphs with all raw data but separated by matrix
     param_to_plot = {
                      'VFA':{'unit':'gAc_eq L'+get_super('-1'), 'color':VFA_color, 'test_color':'different'},
                      'TAN':{'unit':'gN L'+get_super('-1'), 'color':TAN_color, 'test_color':'different'},
@@ -207,16 +170,33 @@ def plot_Benchmark(data, path, Res_SNAC_raw):
                      'sep_VFA1':{'unit':'gAc_eq L'+get_super('-1'),'X': 'VFA_ref', 'color':VFA_color, 'test_color':'different'},
                      'sep_VFA2':{'unit':'gAc_eq L'+get_super('-1'),'X': 'VFA_ref', 'color':VFA_color, 'test_color':'different'},
                      'sep_TAN':{'unit':'gN L'+get_super('-1'),'X': 'TAN_ref', 'color':TAN_color, 'test_color':'different'},
+                     'IC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'), 'color':TAC_color, 'test_color':'different'},
                      'TAC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'), 'color':TAC_color, 'test_color':'different'},
-                     'FOS':{'unit':'gAc_eq L'+get_super('-1'), 'X':'FOS_ref', 'Y':'FOS_geq', 'color':FOS_color, 'test_color':'different','title': 'FOS ref', 'linear_regression':'yes'},
-                     'IC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'), 'color':TAC_color, 'test_color':'different'}
+                     'FOS':{'unit':'gAc_eq L'+get_super('-1'), 'X':'VFA_ref', 'Y':'FOS_geq', 'color':FOS_color, 'test_color':'different'},
+                     'Hach_FOS':{'unit':'gAc_eq L'+get_super('-1'), 'X':'VFA_ref', 'Y':'Hach_FOS_geq', 'color':FOS_color, 'test_color':'different'},
                      }
 
-    ###### all graphs
+
     for param in param_to_plot:
         standard_plot_new(data, param_to_plot, param, path, 'T_all_')
 
+    ###### graphs with all raw data but not separated by matrix and with linear regression
+    param_to_plot = {
+                     'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform','titre_supp': '', 'lr': linear_regression},
+                     'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'Hach_FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'lr': linear_regression},
+                     'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression},
+                     'TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'uniform', 'lr': linear_regression},
+                     'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform', 'lr': linear_regression},
+                     'pls_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform', 'lr': linear_regression},
+                    'IC': {'unit': 'gCaCO' + get_sub('3') + '_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform', 'lr': linear_regression},
+                    'TAC': {'unit': 'gCaCO' + get_sub('3') + '_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform', 'lr': linear_regression},
+                     }
 
+
+    for param in param_to_plot:
+        standard_plot_new(data, param_to_plot, param, path, 'T_all_uniform_')
+
+    ###### graphs with raw data separated by Tx
     param_to_plot = {
                      'VFA':{'unit':'gAc_eq L'+get_super('-1'), 'color':VFA_color, 'test_color':'uniform'},
                      'TAN':{'unit':'gN L'+get_super('-1'), 'color':TAN_color, 'test_color':'uniform'},
@@ -226,11 +206,12 @@ def plot_Benchmark(data, path, Res_SNAC_raw):
                      'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
                      'sep_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform'},
                      'TAC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'), 'color':TAC_color, 'test_color':'uniform'},
-                     'FOS':{'unit':'gAc_eq L'+get_super('-1'), 'X':'FOS_ref', 'Y':'FOS_geq', 'color':FOS_color, 'test_color':'uniform','title': 'VFA ref'},
+                     'FOS':{'unit':'gAc_eq L'+get_super('-1'), 'X':'VFA_ref', 'Y':'FOS_geq', 'color':FOS_color, 'test_color':'uniform'},
+                    'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'Hach_FOS_geq', 'color': FOS_color,'test_color': 'uniform'},
                      'IC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'), 'color':TAC_color, 'test_color':'uniform'}
                      }
 
-    ###### all graphs
+
     for param in param_to_plot:
         for Tx in data.index.get_level_values(0).drop_duplicates():
             name = Tx + '_'
@@ -270,6 +251,9 @@ def plot_Benchmark(data, path, Res_SNAC_raw):
                      'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'different'},
                      'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'different'},
                      'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'different'},
+                     'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color, 'test_color': 'different'},
+                     'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'Hach_FOS_geq','color': FOS_color, 'test_color': 'different'},
+
                      }
     # graphs with all Tx
     for param in param_to_plot:
@@ -289,59 +273,17 @@ def plot_Benchmark(data, path, Res_SNAC_raw):
 
 
     ##### FOS analysis based on VFA ref
-    param_to_plot= {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': VFA_color, 'test_color':'different','titre_supp': '_(VFA ref)'}}
+    param_to_plot= {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': VFA_color, 'test_color':'different','titre_supp': '_(FOS ref)'}}
     for i in param_to_plot:
         standard_plot_new(data, param_to_plot, i, path, 'T_all_')
 
-    param_to_plot = {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': VFA_color,'test_color': 'uniform','titre_supp': '_(VFA ref)'}}
+    param_to_plot = {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': VFA_color,'test_color': 'uniform','titre_supp': '_(FOS ref)'}}
     for i in param_to_plot:
         for ii in data.index.get_level_values(0).drop_duplicates():
             name = ii + '_'
             data_plot = data.loc[ii, :]  # we select data
             standard_plot_new(data_plot, param_to_plot, i, path, name)
 
-    plt.close('all')
-
-    ###### FOS analysis (Hach) based on VFA ref
-    param_to_plot= {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': VFA_color, 'test_color':'different','titre_supp': '_(Hach-VFA_ref)'}}
-    for i in param_to_plot:
-        FOS_Hach_plot(data, param_to_plot, i, path, 'T_all_') # need another function because
-        # standard_plot_new(data, param_to_plot, i, path, 'T_all_')
-
-    param_to_plot = {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': VFA_color,'test_color': 'uniform','titre_supp': '_Hach_(VFA_ref)'}}
-    for i in param_to_plot:
-        for ii in data.index.get_level_values(0).drop_duplicates():
-            name = ii + '_'
-            data_plot = data.loc[ii, :]  # we select data
-            FOS_Hach_plot(data_plot, param_to_plot, i, path, name)
-    plt.close('all')
-
-    #### FOS zoom
-    data_selection = data.copy(deep=True)
-    data_selection = data_selection[data_selection.loc[:, 'Ref_res_mean']['VFA_ref'] <= 1.0]
-        ##### FOS analysis based on VFA ref
-    param_to_plot= {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': VFA_color, 'test_color':'different','titre_supp': '_(VFA ref)_zoom'}}
-    for i in param_to_plot:
-        standard_plot_new(data_selection, param_to_plot, i, path, 'T_all_')
-
-    param_to_plot = {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': VFA_color,'test_color': 'uniform','titre_supp': '_(VFA ref)_zoom'}}
-    for i in param_to_plot:
-        for Tx in data_selection.index.get_level_values(0).drop_duplicates():
-            name = Tx + '_'
-            data_plot = data_selection.loc[Tx, :]  # we select data
-            standard_plot_new(data_plot, param_to_plot, i, path, name)
-
-        ###### FOS analysis (Hach) based on VFA ref
-    param_to_plot= {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': VFA_color, 'test_color':'different','titre_supp': '_Hach_(VFA_ref)_zoom'}}
-    for param in param_to_plot:
-        FOS_Hach_plot(data_selection, param_to_plot, param, path, 'T_all_')
-
-    param_to_plot = {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_ref', 'color': VFA_color,'test_color': 'uniform','titre_supp': '_Hach_(VFA_ref)_zoom'}}
-    for i in param_to_plot:
-        for Tx in data_selection.index.get_level_values(0).drop_duplicates():
-            name = Tx + '_'
-            data_plot = data_selection.loc[Tx, :]  # we select data
-            FOS_Hach_plot(data_plot, param_to_plot, i, path, name)
     plt.close('all')
 
 
@@ -471,10 +413,11 @@ def standard_plot_new(data,dict_param,param,path,save_name):
         if not ((data.loc[:, 'Ref_res_mean'][X].isna().all()) or (data.loc[:, 'SNAC_res_mean'][Y].isna().all())): # condition to avoid error with missing data
             if 'titre_supp' in dict_param[param]:
                 title_save = save_name + param + dict_param[param]['titre_supp']
-                title ='SNAC/Ref Comparison - ' + param
+                title = 'Comparison Estimator - Reference'
+
             else:
                 title_save = save_name + param
-                title ='SNAC/Ref Comparison - ' + param
+                title = 'Comparison Estimator - Reference'
 
 
             fig, ax = plt.subplots(1, 1, figsize=(6, 6), dpi=dpi_value)
@@ -533,6 +476,7 @@ def standard_plot_new(data,dict_param,param,path,save_name):
                     std_matrix = std.loc[i,:]
                     median_matrix = median.loc[i, :]
                     ref_std_matrix = ref_std.loc[i,:]
+                    name_livrable = {'T1': 'Water1','T2': 'Water2','T3': 'WWTP','T4': 'Agri'}
 
                     # just to plot the legend of only one median
                     if count_median == 0:
@@ -541,7 +485,7 @@ def standard_plot_new(data,dict_param,param,path,save_name):
                     else:
                         ax.scatter(ref_matrix, median_matrix, marker='+', color='red')
 
-                    ax.scatter(ref_matrix, mean_matrix, color=globals()[i], label=i+' mean')
+                    ax.scatter(ref_matrix, mean_matrix, color=globals()[i], label=name_livrable[i] +' mean')
 
                     # just to plot the legend of only one std
                     if count_std == 0:
@@ -645,13 +589,13 @@ def standard_plot_new(data,dict_param,param,path,save_name):
                     if not isinstance(dict_param[param]['lr'], pd.DataFrame):
                         if dict_param[param]['lr'] == None:
                             logging.info('no linear regression active for ' + param)
-                        elif dict_param[param]['lr'] == 'yes':
+                        elif dict_param[param]['lr'] == 'indip':
                             reg, R2, a, b = linear_regression(x=ref, y=mean)
                             X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
                             X_regr = X_regr.reshape(X_regr.size, 1)
                             ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
                                     label='lin. regr')
-                            ax.text(0.98, 0.02, 'lin. regr:\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, a, b), ha='right',
+                            ax.text(0.98, 0.02, 'lin. regr. (indip.):\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, a, b), ha='right',
                                     va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
                             logging.info('linear regression active ' + param)
                     else:  # we have a dictionary
@@ -664,7 +608,7 @@ def standard_plot_new(data,dict_param,param,path,save_name):
                             X_regr = X_regr.reshape(X_regr.size, 1)
                             ax.plot(X_regr, a * X_regr + b, mark4, color=lin_regr_color, lw=2,
                                     label='lin. regr')
-                            ax.text(0.98, 0.02, 'lin. regr:\n$R^{2}$='+R2+'\ny=%.2fx + %.2f' % (a, b), ha='right',
+                            ax.text(0.98, 0.02, 'lin. regr. (coeff):\n$R^{2}$='+R2+'\ny=%.2fx + %.2f' % (a, b), ha='right',
                                     va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
                         else:
                             logging.info('No corrective factors for ' + index)
@@ -687,14 +631,13 @@ def standard_plot_new(data,dict_param,param,path,save_name):
                 ax.set_ylim(ymax=dict_param[param]['xy_lim'][0])
                 ax.set_xlim(xmax=dict_param[param]['xy_lim'][1])
                 ax.yaxis.set_major_formatter("{x:.1f}")  # set tick format with only 1 decimal
-            ax.set_xlabel('Reference (' + dict_param[param]['unit'] + ')', fontsize=fontsize, fontname=fontname)
-            ax.set_ylabel('SNAC (' + dict_param[param]['unit'] + ')', fontsize=fontsize, fontname=fontname)
+            ax.set_xlabel(X + '  -  '+dict_param[param]['unit'], fontsize=fontsize, fontname=fontname)
+            ax.set_ylabel('Estimator: '+ param+'  -  ' + dict_param[param]['unit'], fontsize=fontsize, fontname=fontname)
             ax.tick_params(axis='both', labelsize=fontsize_tick)
             ax.legend(loc='upper left',fontsize=fontsize_legend)
-            if 'pls' not in title_save:
-                fig.savefig(path+'/image' + '/'+title_save+ '.png')
-            else:
-                fig.savefig(path + '/image_pls' + '/' + title_save + '.png')
+
+            fig.savefig(path+'/image' + '/'+title_save+ '.png')
+
 
             plt.close()
     else:
@@ -704,11 +647,8 @@ def standard_plot_new(data,dict_param,param,path,save_name):
 
 def plot_exactitude_general(data, dict_param, param, path, save_name):
     logging.info(param)
-    param_ref = param # we do that becaus the IC has no reference values and we use TAC for comparison
-    # if param == 'IC'or param == 'TAC':
-    #     param_ref = 'TAC_fostac'
     Y = param + '_geq'
-    X = param_ref + '_ref'
+    X = param + '_ref'
     if 'X' in dict_param[param]:
         X = dict_param[param]['X']
     if 'Y' in dict_param[param]:
@@ -716,10 +656,10 @@ def plot_exactitude_general(data, dict_param, param, path, save_name):
 
     if 'titre_supp' in dict_param[param]:
         title_save = save_name + param + dict_param[param]['titre_supp']
-        title = 'Accuracy Profile - '+ param
+        title = 'Accuracy Profile'
     else:
         title_save = save_name + param
-        title = 'Accuracy Profile - '+ param
+        title = 'Accuracy Profile'
 
     ref = data.loc[:, 'Ref_res_mean'][X]
 
@@ -732,7 +672,7 @@ def plot_exactitude_general(data, dict_param, param, path, save_name):
         acceptability_interval_x2, acceptability_interval_up2, acceptability_interval_down2 = accep_interval(abs_before_1=0.25,rel_after_1=25,limit_graphs=[0,1,max(ref)])
         acceptability_interval_x3, acceptability_interval_up3, acceptability_interval_down3 = accep_interval(abs_before_1=0.30,rel_after_1=30,limit_graphs=[0,1,max(ref)])
     
-        fig, ax = plt.subplots(1, 1, figsize=(6, 6), dpi=dpi_value)
+        fig, ax = plt.subplots(1, 1, figsize=(7, 6), dpi=dpi_value)
         # ax.axline((0, acceptability_interval_up), slope=0, ls=mark1, label='acceptability_interval_up', color='red')
         # ax.axline((0, acceptability_interval_down), slope=0, ls=mark1, label='acceptability_interval_down', color='red')
     
@@ -751,8 +691,8 @@ def plot_exactitude_general(data, dict_param, param, path, save_name):
         ax.scatter(ref, taux_recouvrement, label='recovery factor', color=dict_param[param]['color'])
         ax.set_ylim(0, 200)
     
-        ax.set_xlabel('Reference ('+dict_param[param]['unit'] + ')', fontsize=fontsize, fontname=fontname)
-        ax.set_ylabel('Relative incertitude (%)', fontsize=fontsize, fontname=fontname)
+        ax.set_xlabel(X + '  -  '+dict_param[param]['unit'], fontsize=fontsize, fontname=fontname)
+        ax.set_ylabel('Relative incertitude: '+param+'  -  (%)', fontsize=fontsize, fontname=fontname)
         ax.tick_params(axis='both', labelsize=fontsize_tick)
         ax.legend(loc='upper center',fontsize=fontsize_legend)
         ax.set_title(title, fontsize=fontsize, fontname=fontname)
@@ -763,19 +703,16 @@ def plot_exactitude_general(data, dict_param, param, path, save_name):
                     dict_param[param]['linear_correction'][0], dict_param[param]['linear_correction'][1]),
                     ha='right', va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
 
-        if 'pls' not in title_save:
-            fig.savefig(path + '/image' + '/' + title_save + '.png')
-        else:
-            fig.savefig(path + '/image_pls' + '/' + title_save + '.png')
+        fig.savefig(path+'/image' + '/' + title_save + '.png')
+
         plt.close('all')
     else:
-        logging.info('Plot accuracy profile impossible because '+Y + ' not in dataframe')
+        logging.error('Plot Accuracy Profile impossible because '+Y + ' not in dataframe')
     return
 
-def FOS_Hach_plot(data,dict_param,param,path,save_name):
-    param_ref = param # we do that because the IC has no reference values and we use TAC for comparison
-    if param == 'IC'or param == 'TAC':
-        param_ref = 'TAC_fostac'
+
+def box_plot_variance(data,dict_param,param,path,save_name):
+    param_ref = param
     Y = param + '_geq'
     X = param_ref + '_ref'
     if 'X' in dict_param[param]:
@@ -783,136 +720,49 @@ def FOS_Hach_plot(data,dict_param,param,path,save_name):
     if 'Y' in dict_param[param]:
         Y = dict_param[param]['Y']
 
-    # if 'ref' in Y:
-    #     Y_select =
-    if not ((data.loc[:, 'Ref_res_mean'][X].isna().all()) or (data.loc[:, 'Ref_res_mean'][Y].isna().all())):
-        if 'titre_supp' in dict_param[param]:
-            title_save = save_name + param + dict_param[param]['titre_supp']
-            title = 'Hach/Ref Comparison - ' + param
-        else:
-            title_save = save_name + param
-            title = 'Hach/Ref Comparison - ' + param
+    if 'titre_supp' in dict_param[param]:
+        title_save = save_name + param + dict_param[param]['titre_supp']
+        title = 'Variance analysis (param - estimator): ' + X.replace('_ref', '') + ' - ' + Y.replace('_geq', '')
+    else:
+        title_save = save_name + param
+        title = 'Variance analysis (param - estimator): ' + X.replace('_ref', '') + ' - ' + Y.replace('_geq', '')
 
-        fig, ax = plt.subplots(1, 1, figsize=(6, 6), dpi=dpi_value)
-        ref = data.loc[:, 'Ref_res_mean'][X]
-        ref_std = data.loc[:, 'Ref_res_std'][X]
-        mean = data.loc[:, 'Ref_res_mean'][Y]
-        std = data.loc[:, 'Ref_res_std'][Y]
-        median = data.loc[:, 'Ref_res_median'][Y]
+    try:
+        sr = data.loc[:, 'SNAC_res_std_kr'][Y]
+        sb = data.loc[:, 'SNAC_res_std_kb'][Y]
+        R = data.loc[:, 'SNAC_res_R'][Y]
+        conc = data.loc[:, 'Ref_res_mean'][X]
 
-        max_bisector = max(ref.max(), mean.max())
-        ax.plot([0, max_bisector], [0, max_bisector], '--', color=bis_color, label='bisector', lw=1)
+        x = np.arange(len(conc))  # the label locations
+        width = 0.2  # the width of the bars
+        fig, ax = plt.subplots(1, 1, figsize=(7, 6), dpi=dpi_value)
+        ax2 = ax.twinx()  # Create another axes that shares the same x-axis as ax.
+        ax.bar(x - width, sr, width, label='s'+get_sub('r'))
+        ax.bar(x, sb, width, label='s'+get_sub('b'))
+        ax2.bar(x + width, R, width, color='green', label='s'+get_super('2')+get_sub('b')+'/s'+get_super('2')+get_sub('r'))
+        # Add some text for labels, title and custom x-axis tick labels, etc.
 
-        # ranges
-        coeff = 0.2 * max_bisector  # 20 %
-        ax.plot([0,max_bisector-coeff], [0, max_bisector], mark1, color=accept_lim1, label='interval 20%', lw=1)
-        ax.plot([0, max_bisector], [0, max_bisector-coeff], mark1, color=accept_lim1, lw=1)
+        ax.set_ylabel('s'+get_sub('r')+', s'+get_sub('b')+'', fontsize=fontsize, fontname=fontname)
+        ax2.set_ylabel('s'+get_super('2')+get_sub('b')+'/s'+get_sub('2')+get_sub('r'), fontsize=fontsize, fontname=fontname)
 
-        coeff = 0.25 * max_bisector  # 25 %
-        ax.plot([0,max_bisector-coeff], [0, max_bisector], mark1, color=accept_lim2,label='interval 25%', lw=1)
-        ax.plot([0, max_bisector], [0, max_bisector-coeff], mark1, color=accept_lim2, lw=1)
-
-        coeff = 0.30 * max_bisector  # 25 %
-        ax.plot([0,max_bisector-coeff], [0, max_bisector], mark1, color=accept_lim3,label='interval 30%', lw=1)
-        ax.plot([0, max_bisector], [0, max_bisector-coeff], mark1, color=accept_lim3, lw=1)
-
-
-        if (dict_param[param]['test_color'] == 'different') and (len(data.index.names) > 1):
-            count_median = 0
-            count_std = 0
-            for i in data.index.get_level_values(0).drop_duplicates():
-                ref_matrix = ref.loc[i,:]
-                mean_matrix = mean.loc[i,:]
-                std_matrix = std.loc[i,:]
-                median_matrix = median.loc[i, :]
-                ref_std_matrix = ref_std.loc[i,:]
-                # plot median
-                if count_median == 0:
-                    ax.scatter(ref_matrix, median_matrix, marker='+', color='red', label=' median')
-                    count_median = count_median +1
-                else:
-                    ax.scatter(ref_matrix, median_matrix, marker='+', color='red')
-
-                # std
-                if count_std == 0:
-                    if not std_matrix.isna().all():
-                        ax.errorbar(ref_matrix, mean_matrix, yerr=std_matrix, fmt=",", color='dimgrey', label='std',
-                                    markersize=8, capsize=3, elinewidth=1)
-                    if not ref_std.isna().all():  # if they are not all nan we plot it ( we have error only for FOS and TAC because made with the Hach fostac)
-                        ax.errorbar(ref_matrix, mean_matrix, xerr=ref_std_matrix, fmt=",", color='dimgrey', label='std',
-                                    markersize=8, capsize=3, elinewidth=1)
-                    count_std = count_std + 1
-                else:
-                    if not std_matrix.isna().all():
-                        ax.errorbar(ref_matrix, mean_matrix, yerr=std_matrix, fmt=",", color='dimgrey', markersize=8,capsize=3, elinewidth=1)
-                    if not ref_std.isna().all():  # if they are not all nan we plot it ( we have error only for FOS and TAC because made with the Hach fostac)
-                        ax.errorbar(ref_matrix, mean_matrix, xerr=ref_std_matrix, fmt=",", color='dimgrey',markersize=8, capsize=3, elinewidth=1)
-                # data
-                ax.scatter(ref_matrix, mean_matrix, color=globals()[i], label=i + ' mean')
-        else:
-            ax.scatter(ref, mean, color=dict_param[param]['color'], label='mean')
-            ax.scatter(ref, median, marker='+', color='red', label=' median')
-            if not std.isna().all():
-                ax.errorbar(ref, mean, yerr=std, fmt=",", color='dimgrey',label='std', markersize=8, capsize=3,elinewidth=1)
-            if not ref_std.isna().all(): # if they are not all nan we plot it
-                ax.errorbar(ref, mean, xerr=ref_std, fmt=",", color='dimgrey',label='std', markersize=8, capsize=3, elinewidth=1)
-
-        if 'linear_regression' in dict_param[param]:
-            reg, R2, coef, intercept = linear_regression(x=ref, y=mean)
-            X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
-            X_regr = X_regr.reshape(X_regr.size, 1)
-            ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
-                    label='lin. regr')
-            ax.text(0.98, 0.02,
-                    'lin. regr:\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, coef[0][0], intercept[0]), ha='right', va='bottom',
-                    transform=ax.transAxes, fontsize = fontsize_legend)
-
-        if 'lr' in dict_param[param]:
-            if not isinstance(dict_param[param]['lr'], pd.DataFrame):
-                if dict_param[param]['lr'] == None:
-                    logging.info('no linear regression active for ' + param)
-                elif dict_param[param]['lr'] == 'yes':
-                    reg, R2, a, b = linear_regression(x=ref, y=mean)
-                    X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
-                    X_regr = X_regr.reshape(X_regr.size, 1)
-                    ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
-                            label='lin. regr')
-                    ax.text(0.98, 0.02, 'lin. regr:\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, a, b), ha='right',
-                            va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
-                    logging.info('linear regression active ' + param)
-            else:  # we have a dictionary
-                index = X.replace('_ref', '') + '-' + Y
-                if index in dict_param[param]['lr'].index:
-                    a = dict_param[param]['lr'].loc[index, 'a']
-                    b = dict_param[param]['lr'].loc[index, 'b']
-                    R2 = dict_param[param]['lr'].loc[index, 'R2']
-                    X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
-                    X_regr = X_regr.reshape(X_regr.size, 1)
-                    ax.plot(X_regr, a * X_regr + b, mark4, color=lin_regr_color, lw=2,
-                            label='lin. regr')
-                    ax.text(0.98, 0.02, 'lin. regr:\n$R^{2}$=' + R2 + '\ny=%.2fx + %.2f' % (a, b), ha='right',
-                            va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
-                else:
-                    logging.info('No corrective factors for ' + index)
-
+        ax.set_xticks(x)
+        ax.set_xticklabels(round_value_serie(conc, decimals=2), fontname=fontname)
+        ax.legend(loc='upper left',fontsize=fontsize_legend)
+        ax2.legend(loc='upper right',fontsize=fontsize_legend)
+        ax.grid(axis='y')
         ax.set_title(title, fontsize=fontsize, fontname=fontname)
-        ax.set_ylim(ymin=-0.05)
-        ax.set_xlim(xmin=-0.05)
-        if 'xy_lim' in dict_param[param]:
-            ax.set_ylim(ymax=dict_param[param]['xy_lim'][0])
-            ax.set_xlim(xmax=dict_param[param]['xy_lim'][1])
-            ax.yaxis.set_major_formatter("{x:.1f}")  # set tick format with only 1 decimal
-        ax.set_xlabel('Reference (' + dict_param[param]['unit'] + ')', fontsize=fontsize, fontname=fontname)
-        ax.set_ylabel('Hach (' + dict_param[param]['unit'] + ')', fontsize=fontsize, fontname=fontname)
-        ax.tick_params(axis='both', labelsize=fontsize_tick)
-        ax.legend(loc='upper left', fontsize=fontsize_legend)
-        if 'pls' not in title_save:
-            fig.savefig(path + '/image' + '/' + title_save + '.png')
-        else:
-            fig.savefig(path + '/image_pls' + '/' + title_save + '.png')
-        plt.close()
-    return
 
+        # ax.set_xlabel('Reference (' + dict_param[param]['unit'] + ')', fontsize=fontsize, fontname=fontname)
+        # ax.set_ylabel('SNAC (' + dict_param[param]['unit'] + ')', fontsize=fontsize, fontname=fontname)
+        ax.tick_params(axis='both', labelsize=fontsize_tick)
+        ax2.tick_params(axis='both', labelsize=fontsize_tick)
+        # ax.legend(loc='upper left', fontsize=fontsize_legend)
+
+
+        fig.savefig(path+'/image' + '/' + title_save + '.png')
+        plt.close('all')
+    except:
+        logging.info('Plot variance analysis '+param+' impossible. Please check the error')
 
 def box_plot(data_x,data_y, dict_param, param, path, save_name):
     param_ref = param  # we do that becaus the IC has no reference values and we use TAC for comparison
@@ -981,7 +831,7 @@ def box_plot(data_x,data_y, dict_param, param, path, save_name):
                          xytext=(0, 10),  # distance from text to points (x,y)
                          ha='right')
 
-    fig.savefig(path + '/' + save_name + param + '.png')
+    fig.savefig(path+'/image' + '/' + save_name + param + '.png')
     plt.close()
     return
 
