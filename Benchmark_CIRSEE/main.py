@@ -53,7 +53,11 @@ Res_ref = round_value_pd(Res_ref_raw,decimals=3)
 
 Res_SNAC = round_value_pd(Res_SNAC_raw,decimals=3)
 
-name_to_change = {'506_VFA_geq_PLS': 'pls_VFA_geq',
+name_to_change = {
+    'VFA_geq': 'mech_VFA_geq',
+    'TAN_geq': 'mech_TAN_geq',
+    'IC_geq': 'mech_IC_geq',
+    '506_VFA_geq_PLS': 'pls_VFA_geq',
             '506_TAN_geq_PLS': 'pls_TAN_geq',
             '505_VFA_opt_sep1': 'sep_VFA1_geq',
             '505_VFA_opt_sep2': 'sep_VFA2_geq',
@@ -81,7 +85,7 @@ drop_analysis = {'T3_2_1':['all'],# salt did not dissolved properly
                  'T3_8_5':['all'],# no results because volume too important
                  'T3_8_6':['all'],  # salt did not dissolved properly
                  'T3_8_7':['all'],  # salt did not dissolved properly
-                 # 'T3_8_8':['IC_geq'],  # error on IC je l'enleve car cela ne change rien au resultats
+                 # 'T3_8_8':['mech_IC_geq'],  # error on IC je l'enleve car cela ne change rien au resultats
                  'T4_5_1':['all'],  # pas de fichier src
                  'T4_5_2':['all'],  # pas de fichier src
                  'T4_5_3':['all']
@@ -123,7 +127,7 @@ else: # the difference can come from items order
 #   Metadata table
 All_res_normal_metainfo = pd.DataFrame(
     index=['Total analysis','Total conditions', 'pH_acid_accepted', 'pH_basic_accepted','cond_basic_accepted',
-           'result provided', 'result not provided','erased analysis'], columns=['All','T1','T2','T3','T4', 'VFA', 'TAN','IC', 'TAC', 'FOS','pls_VFA','pls_TAN'])
+           'result provided', 'result not provided','erased analysis'], columns=['All','T1','T2','T3','T4', 'mech_VFA', 'mech_TAN','mech_IC', 'TAC', 'FOS','pls_VFA','pls_TAN'])
 All_res_normal_metainfo['All']['erased analysis'] = str(drop_analysis.__len__()) + ' : ' + str(drop_analysis)
 All_res_normal_metainfo['All']['Total analysis'] = Res_SNAC.shape[0] # we need to keep all the analysis in the data reference
 All_res_normal_metainfo['All']['pH_acid_accepted'] = Res_SNAC[Res_SNAC['101_0']==True].shape[0]
@@ -152,7 +156,7 @@ for i in ['T1','T2','T3','T4']:
         All_res_normal_metainfo[i]['cond_basic_accepted'] = format(count_cond_basic/count, ".0%")
 
 
-for i in ['VFA', 'TAN','IC', 'TAC', 'FOS','pls_VFA','pls_TAN']:
+for i in ['mech_VFA', 'mech_TAN','mech_IC', 'TAC', 'FOS','pls_VFA','pls_TAN']:
     All_res_normal_metainfo[i]['result not provided'] = len(Res_SNAC[Res_SNAC[i+'_geq'].isna()].index.tolist())
     All_res_normal_metainfo[i]['result provided'] = Res_SNAC[i+'_geq'].size - All_res_normal_metainfo[i]['result not provided']
 
@@ -160,7 +164,7 @@ for i in ['VFA', 'TAN','IC', 'TAC', 'FOS','pls_VFA','pls_TAN']:
 #All_res_twoindex = two_index_creation()
 
 # Select only interesting data
-interesting_columns=['VFA_geq','TAN_geq','IC_geq','FOS_geq','TAC_geq',
+interesting_columns=['mech_VFA_geq','mech_TAN_geq','mech_IC_geq','FOS_geq','TAC_geq',
                     'pH_initial','conductivity_initial','pls_VFA_geq',
                      ]
     # add automatically the columns whose name I changed (under the hypothesis that I need them)
@@ -226,15 +230,15 @@ All_res_multiindex = multiindex_analysis_specific(All_res_multiindex,All_res_INT
 
 # Analyse Profil d'exactitude
 """ source: 2010_Cahier_des_techniques dans WP05"""
-# for param in ['VFA','TAN']:
+# for param in ['mech_VFA','mech_TAN']:
     # All_res_INTRAserie = compute_profile_exactitude_simplified(All_res_INTRAserie, param)
 
 
 # creating dataframe with data INTER serie
-dict_param_relation = {'VFA': ['VFA_geq', 'pls_VFA_geq', 'FOS_geq', 'Hach_FOS_geq','sep_VFA1_geq','sep_VFA2_geq'],  # ref : [all param with this ref]
-                       'TAN': ['TAN_geq', 'pls_TAN_geq','sep_TAN_geq'],
-                       'TAC': ['TAC_geq', 'IC_geq'],
-                       # 'FOS': ['FOS_geq'],
+dict_param_relation = {'VFA': ['mech_VFA_geq', 'pls_VFA_geq', 'FOS_geq', 'Hach_FOS_geq','sep_VFA1_geq','sep_VFA2_geq'],  # ref : [all param with this ref]
+                       'TAN': ['mech_TAN_geq', 'pls_TAN_geq','sep_TAN_geq'],
+                       'TAC': ['TAC_geq', 'mech_IC_geq'],
+                       # 'FOS': ['FOS_geq'],# todo : activate if we want to access graphs of FOS ref
                        }
 All_res_ALLserie_dict, All_res_ALLserie_dict_raw, All_res_INTERserie_dict, All_res_INTERserie_dict_raw = INTER_analysis(All_res_multiindex,All_res_INTRAserie, dict_param_relation)
 
@@ -246,10 +250,10 @@ All_res_INTERserie_dict_metainfo = metainfo(All_res_INTERserie_dict)
 #### repeat all code for corrected values #################
 # correction estimators with linear regression
 lim_corr = {
-           'VFA': {'VFA_geq':[0.45,3], 'pls_VFA_geq':[0.0,3], 'FOS_geq':[0,10], 'Hach_FOS_geq':[0,10],'sep_VFA1_geq':[0.45,3],'sep_VFA2_geq':[0.45,3]},  # ref : [all param with this ref]
-           'TAN': {'TAN_geq': [0,5], 'pls_TAN_geq': [0,5],'sep_TAN_geq': [0,5]},
-           'TAC': {'TAC_geq':[0,31], 'IC_geq':[0,31]},
-           # 'FOS': {'FOS_geq': [0,10]},
+           'VFA': {'mech_VFA_geq':[0.45,3], 'pls_VFA_geq':[0.0,3], 'FOS_geq':[0,10], 'Hach_FOS_geq':[0,10],'sep_VFA1_geq':[0.45,3],'sep_VFA2_geq':[0.45,3]},  # ref : [all param with this ref]
+           'TAN': {'mech_TAN_geq': [0,5], 'pls_TAN_geq': [0,5],'sep_TAN_geq': [0,5]},
+           'TAC': {'TAC_geq':[0,31], 'mech_IC_geq':[0,31]},
+           # 'FOS': {'FOS_geq': [0,10]},# todo : activate if we want to access graphs of FOS ref
             }
 
 dict_param_relation_Corr_raw = {}
@@ -383,7 +387,7 @@ logging.info('Saving data ended correctly')
 
 # plot_Benchmark_param(All_res_ALLserie_dict, all_path, truncate_value_pd(Res_SNAC_raw,decimals=1), Res_SNAC_twoindex)
 plot_Benchmark(All_res_INTRAserie, raw_intra_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression =corr_factor) # 'None' or 'indip' ou 'corr_factor'
-plot_Benchmark_param(All_res_INTERserie_dict, raw_inter_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression =None ) # 'None' or 'indip' ou 'corr_factor'
+plot_Benchmark_param(All_res_INTERserie_dict, raw_inter_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression =corr_factor ) # 'None' or 'indip' ou 'corr_factor'
 logging.info('Plotting raw data ended correctly')
 
 plot_Benchmark(All_res_INTRAserie_Corr, corr_intra_path, truncate_value_pd(Res_SNAC_raw,decimals=1),linear_regression ='indip') # 'None' or 'indip' ou 'corr_factor'

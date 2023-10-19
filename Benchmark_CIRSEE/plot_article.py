@@ -61,34 +61,32 @@ value_lim3= 0.30
 
 def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None):
 
-    dict_param_relation = {'VFA':'VFA',# param: ref ; this is important to create graphs from good data dictionary
+    dict_param_relation = {'mech_VFA':'VFA',# param: ref ; this is important to create graphs from good data dictionary
                            'FOS':'VFA',
-                           'corr_FOS': 'VFA',
-                           'corr_Hach_FOS': 'VFA',
                            'Hach_FOS': 'VFA',
                            'pls_VFA':'VFA',
                            'sep_VFA1': 'VFA',
                            'sep_VFA2': 'VFA',
-                           'TAN':'TAN',
+                           'mech_TAN':'TAN',
                            'pls_TAN':'TAN',
                            'sep_TAN': 'TAN',
                            'TAC':'TAC',
-                           'IC':'TAC'
+                           'mech_IC':'TAC'
                            }
 
     param_to_plot = {
-    'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression},
-    'TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'uniform', 'lr': linear_regression},
+    'mech_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression},
+    'mech_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform', 'lr': linear_regression},
     'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform', 'lr': linear_regression},
     'pls_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform', 'lr': linear_regression},
     'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform','lr': linear_regression},
     'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform','lr': linear_regression},
     'sep_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform','lr': linear_regression},
-    'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform','lr': linear_regression},
-    # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'FOS ref','lr': linear_regression, 'titre_supp': ''},
+    'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'X': 'TAC_ref', 'color': TAC_color, 'test_color': 'uniform','lr': linear_regression},
+    # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'FOS ref','lr': linear_regression, 'titre_supp': ' (FOS ref'},
     'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'VFA ref','lr': linear_regression,},
     'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'Hach_FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'title': 'VFA ref','lr': linear_regression,},
-    'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform','lr': linear_regression}
+    'mech_IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'X': 'TAC_ref', 'color': TAC_color, 'test_color': 'uniform','lr': linear_regression}
                     }
     # all graphs
     for param in param_to_plot:
@@ -98,16 +96,14 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None)
 
     ###### VFA zoom
     param_to_plot = {
-        'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression,},
-        'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression,'xy_lim':[1,1]},
+        'mech_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'mech_VFA_geq', 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression,},
+        'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref','Y': 'pls_VFA_geq', 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression,'xy_lim':[1,1]},
         'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression,},
         'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression,},
         # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,
         #         'test_color': 'uniform', 'titre_supp': '',  'lr': linear_regression, 'xy_lim': [2, 2]},
-        'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,
-                'test_color': 'uniform', 'titre_supp': '',  'lr': linear_regression, 'xy_lim': [2, 2]},
-        'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'Hach_FOS_geq', 'color': FOS_color,
-                'test_color': 'uniform', 'titre_supp': '', 'lr': linear_regression, 'xy_lim': [2, 2]},
+        'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'titre_supp': '',  'lr': linear_regression, 'xy_lim': [2, 2]},
+        'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'Hach_FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'titre_supp': '', 'lr': linear_regression, 'xy_lim': [2, 2]},
 
                     }
     for param in param_to_plot:
@@ -117,10 +113,10 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None)
 
     ###### profil exactitude
     param_to_plot = {
-        'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform'},
-        'TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'uniform'},
+        'mech_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform'},
+        'mech_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform'},
         'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'),'X': 'TAC_ref', 'Y': 'TAC_geq', 'color': TAC_color, 'test_color': 'uniform'},
-        'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'X': 'TAC_ref', 'Y': 'IC_geq', 'color': TAC_color, 'test_color': 'uniform'},
+        'mech_IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'X': 'TAC_ref', 'Y': 'mech_IC_geq', 'color': TAC_color, 'test_color': 'uniform'},
         'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
         'pls_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color,'test_color': 'uniform'},
         'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
@@ -134,13 +130,10 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None)
         plot_exactitude_general(data_selection, param_to_plot, param, path, 'All_conc_AP_')
 
     ###### zoom profil exactitude
-    param_to_plot = {'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform'},
-                     'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,
-                                 'test_color': 'uniform'},
-                     'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,
-                                 'test_color': 'uniform'},
-                     'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,
-                                 'test_color': 'uniform'},
+    param_to_plot = {'mech_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color,'X': 'VFA_ref', 'test_color': 'uniform'},
+                     'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
+                     'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
+                     'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
                         }
 
     for param in param_to_plot:
@@ -150,7 +143,7 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None)
 
     ###### IC zoom
     param_to_plot = {
-        'IC': {'unit': 'gCaCO' + get_sub('3') + '_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform',
+        'mech_IC': {'unit': 'gCaCO' + get_sub('3') + '_eq L' + get_super('-1'),'X': 'TAC_ref', 'color': TAC_color, 'test_color': 'uniform',
                'lr': linear_regression}
 
                     }
@@ -159,19 +152,27 @@ def plot_Benchmark_param(data_dict, path, Res_SNAC_raw,linear_regression = None)
         data_selection = data_selection[data_selection.loc[:, 'Ref_res_mean']['TAC_ref'] <= 1.0]
         standard_plot_new(data_selection, param_to_plot, param, path, 'All_conc_zoom_')
 
+    dict_param_relation = {# param: ref ; this is important to create graphs from good data dictionary
+                           'FOS':'FOS',
+                           }
+
+    param_to_plot= {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': VFA_color, 'test_color':'different', 'lr': linear_regression,'titre_supp': '_(FOS ref)'}}
+    for param in param_to_plot:
+        standard_plot_new(data_dict[dict_param_relation[param]], param_to_plot, param, path, 'All_conc_')
+
 def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
 
     ###### graphs with all raw data but separated by matrix
     param_to_plot = {
-                     'VFA':{'unit':'gAc_eq L'+get_super('-1'), 'color':VFA_color, 'test_color':'different'},
-                     'TAN':{'unit':'gN L'+get_super('-1'), 'color':TAN_color, 'test_color':'different'},
+                     'mech_VFA':{'unit':'gAc_eq L'+get_super('-1'), 'X': 'VFA_ref', 'color':VFA_color, 'test_color':'different'},
+                     'mech_TAN':{'unit':'gN L'+get_super('-1'),'X': 'TAN_ref', 'color':TAN_color, 'test_color':'different'},
                      'pls_VFA':{'unit':'gAc_eq L'+get_super('-1'),'X': 'VFA_ref', 'color':VFA_color, 'test_color':'different'},
                      'pls_TAN':{'unit':'gN L'+get_super('-1'),'X': 'TAN_ref', 'color':TAN_color, 'test_color':'different'},
                      'sep_VFA1':{'unit':'gAc_eq L'+get_super('-1'),'X': 'VFA_ref', 'color':VFA_color, 'test_color':'different'},
                      'sep_VFA2':{'unit':'gAc_eq L'+get_super('-1'),'X': 'VFA_ref', 'color':VFA_color, 'test_color':'different'},
                      'sep_TAN':{'unit':'gN L'+get_super('-1'),'X': 'TAN_ref', 'color':TAN_color, 'test_color':'different'},
-                     'IC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'), 'color':TAC_color, 'test_color':'different'},
-                     'TAC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'), 'color':TAC_color, 'test_color':'different'},
+                     'mech_IC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'),'X': 'TAC_ref', 'color':TAC_color, 'test_color':'different'},
+                     'TAC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'),'X': 'TAC_ref', 'color':TAC_color, 'test_color':'different'},
                      'FOS':{'unit':'gAc_eq L'+get_super('-1'), 'X':'VFA_ref', 'Y':'FOS_geq', 'color':FOS_color, 'test_color':'different'},
                      'Hach_FOS':{'unit':'gAc_eq L'+get_super('-1'), 'X':'VFA_ref', 'Y':'Hach_FOS_geq', 'color':FOS_color, 'test_color':'different'},
                      }
@@ -184,12 +185,12 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
     param_to_plot = {
                      'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'FOS_geq', 'color': FOS_color,'test_color': 'uniform','titre_supp': '', 'lr': linear_regression},
                      'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'Hach_FOS_geq', 'color': FOS_color,'test_color': 'uniform', 'lr': linear_regression},
-                     'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression},
-                     'TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'uniform', 'lr': linear_regression},
+                     'mech_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'uniform', 'lr': linear_regression},
+                     'mech_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform', 'lr': linear_regression},
                      'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform', 'lr': linear_regression},
                      'pls_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform', 'lr': linear_regression},
-                    'IC': {'unit': 'gCaCO' + get_sub('3') + '_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform', 'lr': linear_regression},
-                    'TAC': {'unit': 'gCaCO' + get_sub('3') + '_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'uniform', 'lr': linear_regression},
+                    'mech_IC': {'unit': 'gCaCO' + get_sub('3') + '_eq L' + get_super('-1'),'X': 'TAC_ref', 'color': TAC_color, 'test_color': 'uniform', 'lr': linear_regression},
+                    'TAC': {'unit': 'gCaCO' + get_sub('3') + '_eq L' + get_super('-1'),'X': 'TAC_ref', 'color': TAC_color, 'test_color': 'uniform', 'lr': linear_regression},
                      }
 
 
@@ -198,17 +199,17 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
 
     ###### graphs with raw data separated by Tx
     param_to_plot = {
-                     'VFA':{'unit':'gAc_eq L'+get_super('-1'), 'color':VFA_color, 'test_color':'uniform'},
-                     'TAN':{'unit':'gN L'+get_super('-1'), 'color':TAN_color, 'test_color':'uniform'},
+                     'mech_VFA':{'unit':'gAc_eq L'+get_super('-1'),'X': 'VFA_ref', 'color':VFA_color, 'test_color':'uniform'},
+                     'mech_TAN':{'unit':'gN L'+get_super('-1'), 'X': 'TAN_ref', 'color':TAN_color, 'test_color':'uniform'},
                      'pls_VFA':{'unit':'gAc_eq L'+get_super('-1'),'X': 'VFA_ref', 'color':VFA_color, 'test_color':'uniform'},
                      'pls_TAN':{'unit':'gN L'+get_super('-1'),'X': 'TAN_ref', 'color':TAN_color, 'test_color':'uniform'},
                      'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
                      'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'uniform'},
                      'sep_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'uniform'},
-                     'TAC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'), 'color':TAC_color, 'test_color':'uniform'},
+                     'TAC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'),'X': 'TAC_ref', 'color':TAC_color, 'test_color':'uniform'},
                      'FOS':{'unit':'gAc_eq L'+get_super('-1'), 'X':'VFA_ref', 'Y':'FOS_geq', 'color':FOS_color, 'test_color':'uniform'},
                     'Hach_FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'Y': 'Hach_FOS_geq', 'color': FOS_color,'test_color': 'uniform'},
-                     'IC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'), 'color':TAC_color, 'test_color':'uniform'}
+                     'mech_IC':{'unit':'gCaCO'+get_sub('3')+'_eq L'+get_super('-1'),'X': 'TAC_ref', 'color':TAC_color, 'test_color':'uniform'}
                      }
 
 
@@ -226,8 +227,8 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
     data_selection = data.copy(deep=True)
     data_selection = data_selection.droplevel('Matrix').loc[selected_tests, :]
     # data_selection = data_selection.loc[pd.IndexSlice[:, selected_tests], :] # if I keep the multiindex
-    param_to_plot = {'VFA':{'unit':'gAc_eq L'+get_super('-1'), 'color':VFA_color, 'libelled': data_selection.loc[:,'Ref_res_mean'].loc[:,'TAC_ref'], 'test_color':'uniform'},
-                     'TAN':{'unit':'gN L'+get_super('-1'), 'color':TAN_color, 'libelled': data_selection.loc[:,'Ref_res_mean'].loc[:,'TAC_ref'],'test_color':'uniform'}
+    param_to_plot = {'mech_VFA':{'unit':'gAc_eq L'+get_super('-1'),'X': 'VFA_ref', 'color':VFA_color, 'libelled': data_selection.loc[:,'Ref_res_mean'].loc[:,'TAC_ref'], 'test_color':'uniform'},
+                     'mech_TAN':{'unit':'gN L'+get_super('-1'),'X': 'TAN_ref', 'color':TAN_color, 'libelled': data_selection.loc[:,'Ref_res_mean'].loc[:,'TAC_ref'],'test_color':'uniform'}
                      }
     for param in param_to_plot:
         standard_plot_new(data_selection, param_to_plot, param, path, 'TAC influence on ')
@@ -237,8 +238,8 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
     # data_selection = data.copy(deep=True)
     # data_selection = data_selection.droplevel('Matrix').loc[selected_tests, :]
     # # data_selection = data_selection.loc[pd.IndexSlice[:, selected_tests], :] # if I keep the multiindex
-    # param_to_plot = {'VFA':{'unit':'gAc_eq L'+get_super('-1'), 'color':VFA_color, 'libelled': data_selection.loc[:,'Ref_res_mean'].loc[:,'TAN_ref']},
-    #                  # 'TAN':{'unit':'gN L'+get_super('-1'), 'color':TAN_color, 'libelled': data_selection.loc[:,'Ref_res_mean'].loc[:,'TAC_ref']}
+    # param_to_plot = {'mech_VFA':{'unit':'gAc_eq L'+get_super('-1'), 'color':VFA_color, 'libelled': data_selection.loc[:,'Ref_res_mean'].loc[:,'TAN_ref']},
+    #                  # 'mech_TAN':{'unit':'gN L'+get_super('-1'), 'color':TAN_color, 'libelled': data_selection.loc[:,'Ref_res_mean'].loc[:,'TAC_ref']}
     #                  }
     # for i in param_to_plot:
     #     standard_plot(data_selection, param_to_plot, i, path, 'TAN influence on ')
@@ -247,7 +248,7 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
     ###### VFA zoom
     data_selection = data.copy(deep=True)
     data_selection = data_selection[data_selection.loc[:, 'Ref_res_mean']['VFA_ref'] <= 1.0]
-    param_to_plot = {'VFA':{'unit':'gAc_eq L'+get_super('-1'), 'color':VFA_color, 'test_color':'different'},
+    param_to_plot = {'mech_VFA':{'unit':'gAc_eq L'+get_super('-1'),'X': 'VFA_ref', 'color':VFA_color, 'test_color':'different'},
                      'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'different'},
                      'sep_VFA1': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'different'},
                      'sep_VFA2': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'different'},
@@ -263,7 +264,7 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
     data_selection = data.copy(deep=True)
     # data_selection = data_selection.droplevel('Matrix')
     data_selection = data_selection[data_selection.loc[:, 'Ref_res_mean']['VFA_ref'] <= 1.0]
-    param_to_plot = {'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'different'},
+    param_to_plot = {'mech_VFA': {'unit': 'gAc_eq L' + get_super('-1'),'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'different'},
                      'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'different'}}
 
     for param in param_to_plot:
@@ -272,12 +273,12 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
             standard_plot_new(data_selection.loc[Tx,:], param_to_plot, param, path, name)
 
 
-    ##### FOS analysis based on VFA ref
+    ##### FOS analysis based on FOS ref
     param_to_plot= {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': VFA_color, 'test_color':'different','titre_supp': '_(FOS ref)'}}
     for i in param_to_plot:
         standard_plot_new(data, param_to_plot, i, path, 'T_all_')
 
-    param_to_plot = {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': VFA_color,'test_color': 'uniform','titre_supp': '_(FOS ref)'}}
+    param_to_plot = {'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': VFA_color,'test_color': 'uniform', 'lr': linear_regression,'titre_supp': '_(FOS ref)'}}
     for i in param_to_plot:
         for ii in data.index.get_level_values(0).drop_duplicates():
             name = ii + '_'
@@ -289,7 +290,7 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
 
     ###### TAC en fonction VFA
     data_selection = data.copy(deep=True)
-    param_to_plot = {'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'libelled': data_selection.loc[:, 'Ref_res_mean'].loc[:, 'VFA_ref'], 'test_color': 'uniform'}}
+    param_to_plot = {'mech_IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'),'X': 'TAC_ref', 'color': TAC_color, 'libelled': data_selection.loc[:, 'Ref_res_mean'].loc[:, 'VFA_ref'], 'test_color': 'uniform'}}
     for param in param_to_plot:
         for Tx in data_selection.index.get_level_values(0).drop_duplicates():
             name = Tx + '_VFA influence on '
@@ -300,7 +301,7 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
 
     ###### TAC en fonction TAN
     data_selection = data.copy(deep=True)
-    param_to_plot = {'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color,
+    param_to_plot = {'mech_IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'),'X': 'TAC_ref', 'color': TAC_color,
                             'libelled': data_selection.loc[:, 'Ref_res_mean'].loc[:, 'TAN_ref'],
                             'test_color': 'uniform'}
                      }
@@ -339,14 +340,14 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
 
     ###### profil exactitude
     param_to_plot = {
-        'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'different'},
-        'TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'different'},
+        'mech_VFA': {'unit': 'gAc_eq L' + get_super('-1'),'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'different'},
+        'mech_TAN': {'unit': 'gN L' + get_super('-1'),'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'different'},
          'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'different'},
          'pls_TAN': {'unit': 'gN L' + get_super('-1'), 'X': 'TAN_ref', 'color': TAN_color, 'test_color': 'different'},
         # 'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'different'},
         # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,
         #         'test_color': 'different'},
-        # 'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'different'}
+        # 'mech_IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'different'}
     }
 
     for param in param_to_plot:
@@ -359,12 +360,12 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
 
     ###### zoom profil exactitude
     param_to_plot = {
-        'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'different'},
+        'mech_VFA': {'unit': 'gAc_eq L' + get_super('-1'),'X': 'VFA_ref', 'color': VFA_color, 'test_color': 'different'},
          'pls_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'VFA_ref', 'color': VFA_color,'test_color': 'different'},
         # 'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'different'},
         # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,
         #         'test_color': 'different'},
-        # 'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'different'}
+        # 'mech_IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'different'}
     }
 
     data_selection = data.copy(deep=True)
@@ -382,12 +383,12 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
     # #### box plot
 
     # param_to_plot = {
-    #     'VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'different'},
-    #     'TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'different'},
+    #     'mech_VFA': {'unit': 'gAc_eq L' + get_super('-1'), 'color': VFA_color, 'test_color': 'different'},
+    #     'mech_TAN': {'unit': 'gN L' + get_super('-1'), 'color': TAN_color, 'test_color': 'different'},
     #     # 'TAC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'different'},
     #     # 'FOS': {'unit': 'gAc_eq L' + get_super('-1'), 'X': 'FOS_ref', 'Y': 'FOS_geq', 'color': FOS_color,
     #     #         'test_color': 'different'},
-    #     # 'IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'different'}
+    #     # 'mech_IC': {'unit': 'gCaCO'+get_sub('3')+'_eq L' + get_super('-1'), 'color': TAC_color, 'test_color': 'different'}
     # }
     #
 
@@ -400,7 +401,7 @@ def plot_Benchmark(data, path, Res_SNAC_raw,linear_regression =None):
 
 def standard_plot_new(data,dict_param,param,path,save_name):
     param_ref = param # we do that because the IC has no reference values and we use TAC for comparison
-    if param == 'IC'or param == 'TAC':
+    if param == 'mech_IC'or param == 'TAC':
         param_ref = 'TAC'
     Y = param + '_geq'
     X = param_ref + '_ref'
@@ -432,7 +433,7 @@ def standard_plot_new(data,dict_param,param,path,save_name):
 
             # ranges
 
-            if (param in ['VFA', 'TAN', 'pls_VFA','pls_TAN', 'sep_VFA1', 'sep_VFA2','sep_TAN', 'corr_FOS']):
+            if (param in ['mech_VFA', 'mech_TAN', 'pls_VFA','pls_TAN', 'sep_VFA1', 'sep_VFA2','sep_TAN', 'corr_FOS']):
                 value_lim = 0.2
                 coeff = 0.2 * max_bisector  # 20 %
                 ax.plot([1 - value_lim, max_bisector - coeff], [1, max_bisector], mark1, color=accept_lim1, label='interval 20%', lw=1)
@@ -514,34 +515,34 @@ def standard_plot_new(data,dict_param,param,path,save_name):
                                 va='bottom', transform=ax.transAxes, fontsize = fontsize_legend)
 
                     if 'lr' in dict_param[param]:
-                        if dict_param[param]['lr'] == None:
-                            print('no linear regression active')
-                        elif dict_param[param]['lr'] == 'yes':
-                            print('linear regression active')
-                        elif dict_param[param]['lr'] == 'check':
-                            reg, R2, a, b = linear_regression(x=ref_matrix, y=mean_matrix)
-                            X_regr = np.linspace(min(ref_matrix) * 0.9, max(ref_matrix) * 1.1, num=50)
-                            X_regr = X_regr.reshape(X_regr.size, 1)
-                            ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
-                                    label='y=' + str(np.around(a, decimals=2)) + 'x + ' + str(
-                                        np.around(b, decimals=2)) + ', R2=' + str(np.around(R2, decimals=2))
-                                    )
-                            print('linear regression active')
-                        else: #we have a dictionary
-                            index = param_ref + '-' + Y
-                            a = dict_param['lr'].loc[index, 'a']
-                            b = dict_param['lr'].loc[index, 'b']
-                            R2 = dict_param['lr'].loc[index, 'R2']
-
-                            X_regr = np.linspace(min(ref_matrix)*0.9, max(ref_matrix)*1.1, num=50)
-                            X_regr = X_regr.reshape(X_regr.size, 1)
-                            ax.plot(X_regr, a*X_regr+b, mark4, color=lin_regr_color, lw=2,
-                                    label='y=' + str(np.around(a, decimals=2)) + 'x + ' + str(
-                                        np.around(b, decimals=2)) + ', R2=' + str(np.around(R2, decimals=2))
-                                    )
-                        ax.text(0.98, 0.02,
-                                'lin. regr:\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, a, b), ha='right',
-                                va='bottom', transform=ax.transAxes, fontsize = fontsize_legend)
+                        if not isinstance(dict_param[param]['lr'], pd.DataFrame):
+                            if dict_param[param]['lr'] == None:
+                                logging.info('no linear regression active for ' + param)
+                            elif dict_param[param]['lr'] == 'indip':
+                                reg, R2, a, b = linear_regression(x=ref, y=mean)
+                                X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
+                                X_regr = X_regr.reshape(X_regr.size, 1)
+                                ax.plot(X_regr, reg.predict(X_regr), mark4, color=lin_regr_color, lw=2,
+                                        label='lin. regr')
+                                ax.text(0.98, 0.02, 'lin. regr. (indip.):\n$R^{2}$=%.2f\ny=%.2fx + %.2f' % (R2, a, b),
+                                        ha='right',
+                                        va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
+                                logging.info('linear regression active ' + param)
+                        else:  # we have a dictionary
+                            index = X.replace('_ref', '') + '-' + Y
+                            if index in dict_param[param]['lr'].index:
+                                a = dict_param[param]['lr'].loc[index, 'a']
+                                b = dict_param[param]['lr'].loc[index, 'b']
+                                R2 = dict_param[param]['lr'].loc[index, 'R2']
+                                X_regr = np.linspace(min(ref) * 0.9, max(ref) * 1.1, num=50)
+                                X_regr = X_regr.reshape(X_regr.size, 1)
+                                ax.plot(X_regr, a * X_regr + b, mark4, color=lin_regr_color, lw=2,
+                                        label='lin. regr')
+                                ax.text(0.98, 0.02, 'lin. regr. (coeff):\n$R^{2}$=' + R2 + '\ny=%.2fx + %.2f' % (a, b),
+                                        ha='right',
+                                        va='bottom', transform=ax.transAxes, fontsize=fontsize_legend)
+                            else:
+                                logging.info('No corrective factors for ' + index)
 
 
                     if 'libelled' in dict_param[param]:
@@ -766,8 +767,8 @@ def box_plot_variance(data,dict_param,param,path,save_name):
 
 def box_plot(data_x,data_y, dict_param, param, path, save_name):
     param_ref = param  # we do that becaus the IC has no reference values and we use TAC for comparison
-    if param == 'IC' or param == 'TAC':
-        param_ref = 'TAC_fostac'
+    if param == 'mech_IC' or param == 'TAC':
+        param_ref = 'TAC'
     Y = param + '_geq'
     X = param_ref + '_ref'
     if 'X' in dict_param[param]:
@@ -795,7 +796,7 @@ def box_plot(data_x,data_y, dict_param, param, path, save_name):
         if 'T1' not in i:
             data_y_BP_df.drop(index=i, inplace=True)
 
-    parameter = 'VFA_geq'
+    parameter = 'mech_VFA_geq'
     df_param = data_y_BP_df[parameter]
 
     df_plot = pd.DataFrame(columns=['T1_1','T1_2','T1_3'],index=[1,2,3,4,5])
@@ -805,7 +806,7 @@ def box_plot(data_x,data_y, dict_param, param, path, save_name):
 
     fig, ax = plt.subplots(1, 1, figsize=(6, 6), dpi=dpi_value)
     df_plot.boxplot()
-    #data_y_BP_df.boxplot(column=['VFA_geq'], )
+    #data_y_BP_df.boxplot(column=['mech_VFA_geq'], )
 
 ############### fin df box plot #############
 

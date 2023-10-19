@@ -382,9 +382,9 @@ def compute_profile_exactitude_simplified(data_old, param):
     """ source: 2010_Cahier_des_techniques dans WP05"""
 
     data = deepcopy(data_old)
-    dict_param_relation = {'VFA':['VFA_geq','pls_VFA_geq','FOS_geq'], # ref : [all param with this ref]
-                           'TAN':['TAN_geq','pls_TAN_geq'],
-                           'TAC':['TAC_geq','IC_geq'],
+    dict_param_relation = {'VFA':['mech_VFA_geq','pls_VFA_geq','FOS_geq'], # ref : [all param with this ref]
+                           'TAN':['mech_TAN_geq','pls_TAN_geq'],
+                           'TAC':['TAC_geq','mech_IC_geq'],
                            'FOS':['FOS_geq'],
                            }
     profil_param = ['std_kr','std_kb', 'std_FI', 'biais_abs', 'biais_rel', 'Tr', 'std_IT', 'degree', 'k_tol', 'Itol_up_rel',
@@ -423,9 +423,9 @@ def compute_profile_exactitude_global(dict_param_relation, data_global = None, d
 
     data_inter_new = deepcopy(data_all)
 
-    # dict_param_relation = {'VFA':['VFA_geq','pls_VFA_geq','FOS_geq','corr_FOS_geq','corr_Hach_FOS_geq'], # ref : [all param with this ref]
-    #                        'TAN':['TAN_geq','pls_TAN_geq'],
-    #                        'TAC':['TAC_geq','IC_geq'],
+    # dict_param_relation = {'VFA':['mech_VFA_geq','pls_VFA_geq','FOS_geq','corr_FOS_geq','corr_Hach_FOS_geq'], # ref : [all param with this ref]
+    #                        'TAN':['mech_TAN_geq','pls_TAN_geq'],
+    #                        'TAC':['TAC_geq','mech_IC_geq'],
     #                        'FOS':['FOS_geq'],
     #                        }
 
@@ -650,22 +650,21 @@ def accep_interval_bisector(abs_before_1 = 0.2, rel_after_1 = 20, limit_graphs=[
 
 def erase_unusefull_info(data, param):
     data_new = deepcopy(data)
-    variables = ['VFA', 'pls_VFA', 'TAN', 'pls_TAN', 'TAC', 'IC', 'FOS']
-    dict_param_relation = {'VFA': ['VFA', 'pls_VFA', 'FOS'],  # ref : [all param with this ref]
-                           'TAN': ['TAN', 'pls_TAN'],
-                           'TAC': ['TAC', 'IC'],
+    dict_param_relation = {'VFA': ['mech_VFA', 'pls_VFA', 'FOS'],  # ref : [all param with this ref]
+                           'TAN': ['mech_TAN', 'pls_TAN'],
+                           'TAC': ['TAC', 'mech_IC'],
                            'FOS': ['FOS'],
                            }
     for col_name in data_new.columns:  # erase all not used values
         if ('pH') in col_name[1] or ('cond') in col_name[1] or ('FOS_TAC') in col_name[1]:
             data_new.drop(columns=col_name, inplace=True)
         else:
-            for j in variables:
-                if j in col_name[1]:
-                    col_name_true = j
-            if col_name_true not in dict_param_relation[param]:
-                # logging.info('erase :' + str(col_name) + 'param: ' + param)
-                data_new.drop(columns=col_name, inplace=True)
+            if col_name[0] == 'Res_ref':
+                if col_name[1].replace('_ref','') != param:
+                    data_new.drop(columns=col_name, inplace=True)
+            elif col_name[0] == 'Res_SNAC':
+                if col_name[1].replace('_geq','') not in dict_param_relation[param]:
+                    data_new.drop(columns=col_name, inplace=True)
 
     return data_new
 
@@ -722,7 +721,7 @@ def metainfo(All_res_INTERserie_dict):
 
     # I put in a table the information of inter data to put  in the livrable.
     All_res_INTERserie_dict_metainfo = deepcopy(All_res_INTERserie_dict)
-    ref_imp = {'VFA': ['pls_VFA_geq'], 'TAN': ['TAN_geq'], 'TAC': ['TAC_geq']}
+    ref_imp = {'VFA': ['pls_VFA_geq'], 'TAN': ['mech_TAN_geq'], 'TAC': ['TAC_geq']}
     parameter_imp = {'Ref_res_mean': 1, 'SNAC_res_std': 3, 'SNAC_res_mean': 1, 'SNAC_res_k': 1, 'SNAC_res_U': 1,
                      'SNAC_res_U_rel': 0, 'SNAC_res_error_real': 0}  # :'param' :  number --> decimel to round value
     #:format(count_pH_acid/count, ".0%" All_res_INTERserie_dict_metainfo[ref][param].style.format("{:.0%}")
@@ -744,7 +743,7 @@ def metainfo(All_res_INTERserie_dict):
     agrr = [[0, 2], [2, 10], [10, 30]]
     # b=deepcopy(All_res_INTERserie_dict_metainfo)
     c = All_res_INTERserie_dict_metainfo
-    for estimator in ['IC_geq', 'TAC_geq']:
+    for estimator in ['mech_IC_geq', 'TAC_geq']:
         new = pd.DataFrame(columns=['SNAC_res_std_aggr'], index=c['TAC'].index)
         new_rel = pd.DataFrame(columns=['SNAC_res_std_aggr_rel'], index=c['TAC'].index)
         for i in new.index:
